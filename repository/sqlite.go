@@ -23,8 +23,8 @@ func NewSqlite() (*Sqlite, error) {
 }
 
 func (s *Sqlite) CreateUser(user types.User) error {
-	q := "INSERT INTO users (chat_id, region_id, username) VALUES(?, ?, ?)"
-	_, err := s.db.Exec(q, user.ChatID, user.RegionID, user.Username)
+	q := "INSERT INTO users (chat_id, region_id, username, lang) VALUES(?, ?, ?, ?)"
+	_, err := s.db.Exec(q, user.ChatID, user.RegionID, user.Username, user.Language)
 	return err
 }
 
@@ -54,7 +54,7 @@ func (s *Sqlite) GetAllUsersByRegionID(regionID int) ([]int64, error) {
 }
 
 func (s *Sqlite) Init() error {
-	q := "CREATE TABLE IF NOT EXISTS users(chat_id INTEGER UNIQUE, region_id INTEGER, lang TEXT DEFAULT 'ru', last_message_id INTEGER DEFAULT 0, username text)"
+	q := "CREATE TABLE IF NOT EXISTS users(chat_id INTEGER UNIQUE, region_id INTEGER, lang TEXT DEFAULT 'tj', last_message_id INTEGER DEFAULT 0, username text)"
 	_, err := s.db.Exec(q)
 	return err
 }

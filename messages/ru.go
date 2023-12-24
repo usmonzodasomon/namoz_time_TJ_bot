@@ -13,4 +13,5 @@ var RU map[string]string = map[string]string{
 	"NamazTimeBtn":      "Время намаза",
 	"ChooseLanguageBtn": "Выбрать язык",
 	"ChooseRegionBtn":   "Выбрать город",
+	"ChooseLanguage":    "Выберите язык",
 }

@@ -12,12 +12,13 @@ import (
 )
 
 func main() {
-	file, err := os.OpenFile("logfile.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile("data/logs/logfile.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
 
+	log.Println("bot started")
 	// Настроим логирование на вывод в файл
 	log.SetOutput(file)
 
@@ -25,7 +26,7 @@ func main() {
 		log.Printf("error loading env variables: %s", err.Error())
 		return
 	}
-
+	// Получите токен вашего бота из окружения или укажите его здесь
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
 	if err != nil {
 		log.Panic(err.Error())

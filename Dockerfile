@@ -1,7 +1,11 @@
-FROM alpine
+FROM golang:latest
 
-WORKDIR /build
+WORKDIR /home/namazbot
 
-COPY main .
+COPY . .
 
-CMD [". /main"]
+ENV TZ="Asia/Dushanbe"
+
+RUN go build -o main .
+
+CMD ["/home/namazbot/main"]

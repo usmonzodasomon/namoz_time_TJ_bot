@@ -24,7 +24,7 @@ func (b *Bot) SendReminder() {
 				time1 := getMinutes(b.Parser.NamazTime.Namaz[namazID].From) + types.RegionsTime[regionID]
 				time2 := getMinutes(time.Now())
 				// log.Println(time2, time1)
-				if time1-time2 >= 0 && time1-time2 <= 10 && types.SentNotifications[regionID][namazID] == false {
+				if time1-time2 >= 0 && time1-time2 <= 10 && !types.SentNotifications[regionID][namazID] {
 					if err := b.SendMessageForAllUsers(namazID, regionID); err != nil {
 						log.Println(err.Error())
 					}
@@ -77,6 +77,7 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 			b.getMessage(chatID, "IntervalTo"),
 			b.Parser.NamazTime.Namaz[namazID].To.Format("15:04")))
 		msg.ParseMode = "Markdown"
+
 		r, err := b.bot.Send(msg)
 		if err != nil {
 			log.Println("error sending message from timer func: ", err.Error())
@@ -95,13 +96,12 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 }
 
 func (b *Bot) DeleteMessage(chatID int64, messageID int) error {
+	if messageID == 0 {
+		return nil
+	}
 	_, err := b.bot.DeleteMessage(tgbotapi.DeleteMessageConfig{
 		ChatID:    chatID,
 		MessageID: messageID,
 	})
-	if err != nil {
-		log.Printf("Error deleting message: %v", err)
-		return err
-	}
 	return err
 }

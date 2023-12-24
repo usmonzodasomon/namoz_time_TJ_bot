@@ -13,11 +13,12 @@ import (
 )
 
 func (b *Bot) start(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, messages.Messages["ru"]["Welcome"]+"\n\n"+messages.Messages["tj"]["Welcome"])
+	msg := tgbotapi.NewMessage(message.Chat.ID, messages.Messages["tj"]["Welcome"]+"\n\n"+messages.Messages["ru"]["Welcome"])
 	user := types.User{
 		ChatID:   message.Chat.ID,
 		RegionID: 0,
 		Username: message.From.UserName,
+		Language: "tj",
 	}
 	if err := b.db.CreateUser(user); err != nil {
 		if err.Error() != "UNIQUE constraint failed: users.chat_id" {
@@ -25,22 +26,8 @@ func (b *Bot) start(message *tgbotapi.Message) error {
 		}
 	}
 
-	lang, err := b.db.GetLang(message.Chat.ID)
-	if err != nil {
-		return err
-	}
-
-	replyKeyboard := tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("🕓 "+messages.Messages[lang]["NamazTimeBtn"]),
-		),
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("🇹🇯 "+messages.Messages[lang]["ChooseLanguageBtn"]),
-			tgbotapi.NewKeyboardButton("🏙 "+messages.Messages[lang]["ChooseRegionBtn"]),
-		),
-	)
-	msg.ReplyMarkup = replyKeyboard
-	_, err = b.bot.Send(msg)
+	msg.ReplyMarkup = b.GetButtons(message.Chat.ID)
+	_, err := b.bot.Send(msg)
 	return err
 }
 
@@ -76,6 +63,7 @@ func (b *Bot) time(chatID int64) error {
 	}
 	msg := tgbotapi.NewMessage(chatID, namazString)
 	msg.ParseMode = "MarkdownV2"
+	msg.ReplyMarkup = b.GetButtons(chatID)
 	_, err = b.bot.Send(msg)
 	return err
 }
@@ -117,6 +105,7 @@ func (b *Bot) region(message *tgbotapi.Message) error {
 
 func (b *Bot) Uncknown(message *tgbotapi.Message) error {
 	msg := tgbotapi.NewMessage(message.Chat.ID, b.getMessage(message.Chat.ID, "UnknownCommand"))
+	msg.ReplyMarkup = b.GetButtons(message.Chat.ID)
 	_, err := b.bot.Send(msg)
 	return err
 }
@@ -128,7 +117,7 @@ func (b *Bot) language(message *tgbotapi.Message) error {
 			tgbotapi.NewKeyboardButton("🇷🇺 Русский"),
 		),
 	)
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Lang: ")
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.getMessage(message.Chat.ID, "ChooseLanguage")+": ")
 	msg.ReplyMarkup = replyKeyboard
 	_, err := b.bot.Send(msg)
 	return err
@@ -138,6 +127,9 @@ func (b *Bot) changeLanguage(message *tgbotapi.Message) error {
 	lang := "ru"
 	if message.Text == "🇹🇯 Тоҷикӣ" {
 		lang = "tj"
+	}
+	if message.Text == "🇷🇺 Русский" {
+		lang = "ru"
 	}
 	if err := b.db.UpdateLanguage(message.Chat.ID, lang); err != nil {
 		return err

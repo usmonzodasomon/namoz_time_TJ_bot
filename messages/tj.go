@@ -13,4 +13,5 @@ var TJ map[string]string = map[string]string{
 	"NamazTimeBtn":      "Вақти намоз",
 	"ChooseLanguageBtn": "Интихоби забон",
 	"ChooseRegionBtn":   "Интихоби шаҳр",
+	"ChooseLanguage":    "Забонро интихоб кунед",
 }

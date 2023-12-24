@@ -11,22 +11,7 @@ import (
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.CallbackQuery != nil {
-			// Получаем данные о нажатой кнопке
-			callbackData := update.CallbackQuery.Data
-			userID := update.CallbackQuery.From.ID
-			// messageID := update.CallbackQuery.Message.MessageID
-
-			// Создаем новое сообщение как ответ на нажатие кнопки
-			msg := tgbotapi.NewMessage(int64(userID), b.getMessage(int64(userID), "YourChoose")+": "+callbackData)
-			if err := b.db.UpdateRegionID(update.CallbackQuery.Message.Chat.ID, types.RegionsID[callbackData]); err != nil {
-				log.Println(err.Error())
-			}
-			// msg.ReplyToMessageID = messageID
-			b.bot.Send(msg)
-
-			// Отвечаем на CallbackQuery
-			callbackResponse := tgbotapi.NewCallback(update.CallbackQuery.ID, "")
-			b.bot.AnswerCallbackQuery(callbackResponse)
+			b.processCallbackQuery(update.CallbackQuery)
 			continue
 		}
 		if update.Message == nil {
@@ -38,7 +23,6 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 		}
 
 		b.processButton(update.Message)
-		// b.handleMassage(update.Message)
 	}
 }
 
@@ -86,4 +70,20 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) {
 	default:
 		b.Uncknown(message)
 	}
+}
+
+func (b *Bot) processCallbackQuery(CallbackQuery *tgbotapi.CallbackQuery) {
+	callbackData := CallbackQuery.Data
+	chatID := CallbackQuery.Message.Chat.ID
+
+	msg := tgbotapi.NewMessage(chatID, b.getMessage(chatID, "YourChoose")+": "+callbackData)
+	if err := b.db.UpdateRegionID(chatID, types.RegionsID[callbackData]); err != nil {
+		log.Println(err.Error())
+	}
+	msg.ReplyMarkup = b.GetButtons(chatID)
+	b.bot.Send(msg)
+
+	// Отвечаем на CallbackQuery
+	callbackResponse := tgbotapi.NewCallback(CallbackQuery.ID, "")
+	b.bot.AnswerCallbackQuery(callbackResponse)
 }

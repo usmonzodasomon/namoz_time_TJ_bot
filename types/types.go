@@ -51,6 +51,7 @@ type User struct {
 	ChatID   int64
 	RegionID int64
 	Username string
+	Language string
 }
 
 var SentNotifications map[int]map[int]bool = make(map[int]map[int]bool)

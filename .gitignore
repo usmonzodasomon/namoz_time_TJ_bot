@@ -1,3 +1,4 @@
 .idea
 .env
-.db
+/data/sqlite/bot.db
+/data/logs/logfile.txt
