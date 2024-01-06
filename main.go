@@ -4,6 +4,7 @@ import (
 	"echobot/parser"
 	"echobot/repository"
 	"echobot/telegram"
+	"io"
 	"log"
 	"os"
 
@@ -19,8 +20,8 @@ func main() {
 	defer file.Close()
 
 	log.Println("bot started")
-	// Настроим логирование на вывод в файл
-	log.SetOutput(file)
+	// Настроим логирование на вывод в файл и консоль одновременно
+	log.SetOutput(io.MultiWriter(os.Stdout, file))
 
 	if err := godotenv.Load(); err != nil {
 		log.Printf("error loading env variables: %s", err.Error())

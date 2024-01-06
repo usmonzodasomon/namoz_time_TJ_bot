@@ -22,8 +22,8 @@ func NewBot(bot *tgbotapi.BotAPI, parser *parser.Parser, db *repository.Sqlite) 
 }
 
 func (b *Bot) Start() error {
-	go b.UpdateTime()
-	go b.SendReminder()
+	go b.UpdateTimeProcedure()
+	go b.SendRemindersProcedure()
 
 	updates, err := b.GetUpdatesChannel()
 	if err != nil {

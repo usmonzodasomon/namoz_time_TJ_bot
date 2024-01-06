@@ -9,33 +9,57 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-var SendReminderTimeSleep = 5 * time.Minute
+var SendReminderTimeSleep = 3 * time.Minute
 
-// Вызываем SendReminder каждые 5 минут чтобы найти пользоваталей в регионах которых настало время намаза
+// Вызываем SendReminder каждые 3 минут чтобы найти пользоваталей в регионах которых настало время намаза
 // Напоминание отправляются не за долго до наступления времени намаза (до 10 минут)
 
-func (b *Bot) SendReminder() {
+func (b *Bot) SendRemindersProcedure() {
 	for {
-		for namazID := 0; namazID < 5; namazID++ {
-			for regionID := 0; regionID < 13; regionID++ {
-				if b.Parser.NamazTime == nil {
-					break
-				}
-				time1 := getMinutes(b.Parser.NamazTime.Namaz[namazID].From) + types.RegionsTime[regionID]
-				time2 := getMinutes(time.Now())
-				// log.Println(time2, time1)
-				if time1-time2 >= 0 && time1-time2 <= 10 && !types.SentNotifications[regionID][namazID] {
-					if err := b.SendMessageForAllUsers(namazID, regionID); err != nil {
-						log.Println(err.Error())
-					}
-					types.SentNotifications[regionID] = make(map[int]bool)
-					types.SentNotifications[regionID][namazID] = true
-					break
-				}
-			}
-		}
+		b.SendReminders()
 		time.Sleep(SendReminderTimeSleep)
 	}
+}
+
+func (b *Bot) SendReminders() {
+	if b.Parser.NamazTime == nil {
+		return
+	}
+
+	for namazID := 0; namazID < 5; namazID++ {
+		b.SendRemindersForNamaz(namazID)
+	}
+}
+
+func (b *Bot) SendRemindersForNamaz(namazID int) {
+	for regionID := 0; regionID < 13; regionID++ {
+		b.SendRemindersForRegion(namazID, regionID)
+	}
+}
+
+func (b *Bot) SendRemindersForRegion(namazID, regionID int) {
+	nmzTimeForCurrRegion := getNamazTimeForCurrentRegionInMinutes(
+		b.Parser.NamazTime.Namaz[namazID].From, regionID)
+
+	nowInMinutes := getMinutes(time.Now())
+
+	if isNamazTime(nmzTimeForCurrRegion, nowInMinutes) && !types.SendNotifications[regionID][namazID] {
+		if err := b.SendMessageForAllUsers(namazID, regionID); err != nil {
+			log.Println("error sending notification:", err)
+		}
+		types.SendNotifications[regionID] = make(map[int]bool)
+		types.SendNotifications[regionID][namazID] = true
+		return
+	}
+}
+
+func isNamazTime(namazTimeForCurrentRegionInMinutes, nowInMinutes int) bool {
+	return namazTimeForCurrentRegionInMinutes-nowInMinutes >= 0 &&
+		namazTimeForCurrentRegionInMinutes-nowInMinutes <= 10
+}
+
+func getNamazTimeForCurrentRegionInMinutes(namazTime time.Time, regionID int) int {
+	return getMinutes(namazTime) + types.RegionsTime[regionID]
 }
 
 func getMinutes(t time.Time) int {
@@ -47,52 +71,62 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 	if err != nil {
 		return err
 	}
+
 	for _, chatID := range usersChatIDs {
 		lang, err := b.db.GetLang(chatID)
 		if err != nil {
-			return err
+			log.Println("Error getting language: ", err, chatID)
+			continue
 		}
 
 		msgID, err := b.db.GetLastMessageID(chatID)
 		if err != nil {
-			return err
+			log.Println("Error getting last message ID: ", err, chatID)
+			continue
 		}
 
 		if err := b.DeleteMessage(chatID, msgID); err != nil {
-			log.Println(err.Error())
+			log.Println("Error deleting message: ", err, chatID)
 		}
 
 		if namazID == 0 {
 			if err := b.time(chatID); err != nil {
-				return err
+				log.Println("Error sending common message: ", err, chatID)
+				continue
 			}
 		}
 
-		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("*%s:* %s\n*%s:* %s %s %s %s",
-			b.getMessage(chatID, "NextNamaz"),
-			types.NamazIndex[lang][namazID],
-			b.getMessage(chatID, "Time"),
-			b.getMessage(chatID, "IntervalFrom"),
-			b.Parser.NamazTime.Namaz[namazID].From.Format("15:04"),
-			b.getMessage(chatID, "IntervalTo"),
-			b.Parser.NamazTime.Namaz[namazID].To.Format("15:04")))
-		msg.ParseMode = "Markdown"
-
+		msg := b.getNextNamazMessage(chatID, lang, namazID)
 		r, err := b.bot.Send(msg)
 		if err != nil {
-			log.Println("error sending message from timer func: ", err.Error())
+			log.Println("error sending next namaz time message : ", err.Error())
 		}
-		if r.Chat == nil {
+
+		if r.Chat == nil { // user bloks bot
 			if err := b.db.DeleteUser(chatID); err != nil {
 				log.Println(err.Error())
 			}
 			continue
 		}
+
 		if err := b.db.UpdateLastMessageID(r.Chat.ID, r.MessageID); err != nil {
 			log.Println("error updating message id: ", err.Error())
 		}
 	}
 	return nil
+}
+
+func (b *Bot) getNextNamazMessage(chatID int64, lang string, namazID int) tgbotapi.MessageConfig {
+	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("*%s:* %s\n*%s:* %s %s %s %s",
+		b.getMessage(chatID, "NextNamaz"),
+		types.NamazIndex[lang][namazID],
+		b.getMessage(chatID, "Time"),
+		b.getMessage(chatID, "IntervalFrom"),
+		b.Parser.NamazTime.Namaz[namazID].From.Format("15:04"),
+		b.getMessage(chatID, "IntervalTo"),
+		b.Parser.NamazTime.Namaz[namazID].To.Format("15:04")))
+	msg.ParseMode = "Markdown"
+	return msg
 }
 
 func (b *Bot) DeleteMessage(chatID int64, messageID int) error {
@@ -103,5 +137,5 @@ func (b *Bot) DeleteMessage(chatID int64, messageID int) error {
 		ChatID:    chatID,
 		MessageID: messageID,
 	})
-	return err
+	return fmt.Errorf("error deleting message: %v, chat_id: %v, message_id = %v", err, chatID, messageID)
 }

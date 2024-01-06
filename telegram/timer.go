@@ -11,7 +11,7 @@ var UpdateTimeTimeSleep = 1 * time.Hour
 // Если возникает ошибка, вызываем снова функцию парсера через минуту
 // Если получаем ошибку 3 раза подряд, выходим из цикла и ждём следующего часа
 
-func (b *Bot) UpdateTime() {
+func (b *Bot) UpdateTimeProcedure() {
 	for {
 		Time := time.Now().Format("02.01.2006")
 		queryCnt := 0

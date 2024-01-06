@@ -54,7 +54,7 @@ type User struct {
 	Language string
 }
 
-var SentNotifications map[int]map[int]bool = make(map[int]map[int]bool)
+var SendNotifications map[int]map[int]bool = make(map[int]map[int]bool)
 
 var RegionsID map[string]int = map[string]int{
 	"Душанбе":     0,
