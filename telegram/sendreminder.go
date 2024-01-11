@@ -96,7 +96,7 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 			}
 		}
 
-		msg := b.getNextNamazMessage(chatID, lang, namazID)
+		msg := b.getNextNamazMessage(chatID, lang, namazID, regionID)
 		r, err := b.bot.Send(msg)
 		if err != nil {
 			log.Println("error sending next namaz time message : ", err.Error())
@@ -116,15 +116,19 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 	return nil
 }
 
-func (b *Bot) getNextNamazMessage(chatID int64, lang string, namazID int) tgbotapi.MessageConfig {
+func (b *Bot) getNextNamazMessage(chatID int64, lang string, namazID int, region_ID int) tgbotapi.MessageConfig {
 	msg := tgbotapi.NewMessage(chatID, fmt.Sprintf("*%s:* %s\n*%s:* %s %s %s %s",
 		b.getMessage(chatID, "NextNamaz"),
 		types.NamazIndex[lang][namazID],
 		b.getMessage(chatID, "Time"),
 		b.getMessage(chatID, "IntervalFrom"),
-		b.Parser.NamazTime.Namaz[namazID].From.Format("15:04"),
+		b.Parser.NamazTime.Namaz[namazID].From.
+			Add(time.Minute*time.Duration(types.RegionsTime[region_ID])).
+			Format("15:04"), // находим время намаза для региона
 		b.getMessage(chatID, "IntervalTo"),
-		b.Parser.NamazTime.Namaz[namazID].To.Format("15:04")))
+		b.Parser.NamazTime.Namaz[namazID].To.
+			Add(time.Minute*time.Duration(types.RegionsTime[region_ID])).
+			Format("15:04"))) // находим время истечения намаза для региона
 	msg.ParseMode = "Markdown"
 	return msg
 }
