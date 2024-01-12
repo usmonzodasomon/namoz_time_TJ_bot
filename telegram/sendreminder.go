@@ -86,7 +86,7 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 		}
 
 		if err := b.DeleteMessage(chatID, msgID); err != nil {
-			log.Println("Error deleting message: ", err, chatID)
+			log.Println("Error deleting message: ", err)
 		}
 
 		if namazID == 0 {
