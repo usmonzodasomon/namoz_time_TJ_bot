@@ -141,5 +141,8 @@ func (b *Bot) DeleteMessage(chatID int64, messageID int) error {
 		ChatID:    chatID,
 		MessageID: messageID,
 	})
-	return fmt.Errorf("error deleting message: %v, chat_id: %v, message_id = %v", err, chatID, messageID)
+	if err != nil {
+		return fmt.Errorf("error deleting message: %v, chat_id: %v, message_id = %v", err, chatID, messageID)
+	}
+	return nil
 }
