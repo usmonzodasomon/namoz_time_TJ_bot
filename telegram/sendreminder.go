@@ -73,47 +73,51 @@ func (b *Bot) SendMessageForAllUsers(namazID, regionID int) error {
 	}
 
 	for _, chatID := range usersChatIDs {
-		lang, err := b.db.GetLang(chatID)
-		if err != nil {
-			log.Println("Error getting language: ", err, chatID)
-			continue
-		}
-
-		msgID, err := b.db.GetLastMessageID(chatID)
-		if err != nil {
-			log.Println("Error getting last message ID: ", err, chatID)
-			continue
-		}
-
-		if err := b.DeleteMessage(chatID, msgID); err != nil {
-			log.Println("Error deleting message: ", err)
-		}
-
-		if namazID == 0 {
-			if err := b.time(chatID); err != nil {
-				log.Println("Error sending common message: ", err, chatID)
-				continue
-			}
-		}
-
-		msg := b.getNextNamazMessage(chatID, lang, namazID, regionID)
-		r, err := b.bot.Send(msg)
-		if err != nil {
-			log.Println("error sending next namaz time message : ", err.Error())
-		}
-
-		if r.Chat == nil { // user bloks bot
-			if err := b.db.DeleteUser(chatID); err != nil {
-				log.Println(err.Error())
-			}
-			continue
-		}
-
-		if err := b.db.UpdateLastMessageID(r.Chat.ID, r.MessageID); err != nil {
-			log.Println("error updating message id: ", err.Error())
-		}
+		b.SendMessageForUser(chatID, namazID, regionID)
 	}
 	return nil
+}
+
+func (b *Bot) SendMessageForUser(chatID int64, namazID, regionID int) {
+	lang, err := b.db.GetLang(chatID)
+	if err != nil {
+		log.Println("Error getting language: ", err, chatID)
+		return
+	}
+
+	msgID, err := b.db.GetLastMessageID(chatID)
+	if err != nil {
+		log.Println("Error getting last message ID: ", err, chatID)
+		return
+	}
+
+	if err := b.DeleteMessage(chatID, msgID); err != nil {
+		log.Println("Error deleting message: ", err)
+	}
+
+	if namazID == 0 {
+		if err := b.time(chatID); err != nil {
+			log.Println("Error sending common message: ", err, chatID)
+			return
+		}
+	}
+
+	msg := b.getNextNamazMessage(chatID, lang, namazID, regionID)
+	r, err := b.bot.Send(msg)
+	if err != nil {
+		log.Println("error sending next namaz time message : ", err.Error())
+	}
+
+	if r.Chat == nil { // user blocks bot
+		if err := b.db.DeleteUser(chatID); err != nil {
+			log.Println(err.Error())
+		}
+		return
+	}
+
+	if err := b.db.UpdateLastMessageID(r.Chat.ID, r.MessageID); err != nil {
+		log.Println("error updating message id: ", err.Error())
+	}
 }
 
 func (b *Bot) getNextNamazMessage(chatID int64, lang string, namazID int, region_ID int) tgbotapi.MessageConfig {
