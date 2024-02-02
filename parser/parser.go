@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const urlString = "http://shuroiulamo.tj/tj/namaz/ntime"
+const urlString = "https://shuroiulamo.tj/tj/namaz/ntime"
 
 type Parser struct {
 	NamazTime *types.NamazTime
