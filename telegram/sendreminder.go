@@ -111,8 +111,8 @@ func (b *Bot) SendMessageForUser(chatID int64, namazID, regionID int) {
 			if err := b.db.DeleteUser(chatID); err != nil {
 				log.Println(err.Error())
 			}
-			return
 		}
+		return
 	}
 
 	if err := b.db.UpdateLastMessageID(r.Chat.ID, r.MessageID); err != nil {
