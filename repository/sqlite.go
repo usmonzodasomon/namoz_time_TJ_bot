@@ -37,7 +37,7 @@ func (s *Sqlite) GetRegionID(chatID int64) (int, error) {
 }
 
 func (s *Sqlite) GetAllUsersByRegionID(regionID int) ([]int64, error) {
-	q := "SELECT chat_id FROM users WHERE region_id = ?"
+	q := "SELECT chat_id FROM users WHERE is_deleted = false AND region_id = ?"
 	r, err := s.db.Query(q, regionID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,14 @@ func (s *Sqlite) GetAllUsersByRegionID(regionID int) ([]int64, error) {
 }
 
 func (s *Sqlite) Init() error {
-	q := "CREATE TABLE IF NOT EXISTS users(chat_id INTEGER UNIQUE, region_id INTEGER, lang TEXT DEFAULT 'tj', last_message_id INTEGER DEFAULT 0, username text)"
+	q := `
+CREATE TABLE IF NOT EXISTS users(
+    chat_id INTEGER UNIQUE, 
+    region_id INTEGER, 
+    lang TEXT DEFAULT 'tj',
+    last_message_id INTEGER DEFAULT 0,
+     username text,
+     is_deleted BOOLEAN DEFAULT false)`
 	_, err := s.db.Exec(q)
 	return err
 }
@@ -76,6 +83,9 @@ func (s *Sqlite) GetLang(chatID int64) (string, error) {
 	r := s.db.QueryRow(q, chatID)
 	var lang string
 	err := r.Scan(&lang)
+	if lang == "" {
+		lang = "tj"
+	}
 	return lang, err
 }
 
@@ -88,13 +98,13 @@ func (s *Sqlite) UpdateLastMessageID(chatID int64, lastMessageID int) error {
 func (s *Sqlite) GetLastMessageID(chatID int64) (int, error) {
 	q := "SELECT last_message_id FROM users WHERE chat_id = ?"
 	r := s.db.QueryRow(q, chatID)
-	var last_msg_id int
-	err := r.Scan(&last_msg_id)
-	return last_msg_id, err
+	var LastMsgID int
+	err := r.Scan(&LastMsgID)
+	return LastMsgID, err
 }
 
 func (s *Sqlite) DeleteUser(chatID int64) error {
-	q := "DELETE FROM users WHERE chat_id = ?"
+	q := "UPDATE users SET is_deleted = true WHERE chat_id = ?"
 	_, err := s.db.Exec(q, chatID)
 	return err
 }

@@ -106,13 +106,13 @@ func (b *Bot) SendMessageForUser(chatID int64, namazID, regionID int) {
 	r, err := b.bot.Send(msg)
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
-	}
-
-	if r.Chat == nil { // user blocks bot
-		if err := b.db.DeleteUser(chatID); err != nil {
-			log.Println(err.Error())
+		if err.Error() == "Forbidden: bot was blocked by the user" {
+			log.Println("deleting user: ", chatID)
+			if err := b.db.DeleteUser(chatID); err != nil {
+				log.Println(err.Error())
+			}
+			return
 		}
-		return
 	}
 
 	if err := b.db.UpdateLastMessageID(r.Chat.ID, r.MessageID); err != nil {
