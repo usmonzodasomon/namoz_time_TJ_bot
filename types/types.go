@@ -19,7 +19,7 @@ var NamazIndex map[string]map[int]string = map[string]map[int]string{
 	},
 }
 
-var Stickers []string = []string{
+var Stickers = []string{
 	"🏙",
 	"🌅",
 	"🌇",
@@ -42,47 +42,63 @@ type NamazTimeStruct struct {
 	To   time.Time
 }
 
+//type NamazTimeSl struct {
+//	Date  string
+//	Namaz [5]NamazTimeStruct
+//}
+
 type NamazTime struct {
-	Today time.Time
-	Namaz [5]NamazTimeStruct
+	Date        string `db:"date"`
+	FajrFrom    string `db:"fajr_from"`
+	FajrTo      string `db:"fajr_to"`
+	ZuhrFrom    string `db:"zuhr_from"`
+	ZuhrTo      string `db:"zuhr_to"`
+	AsrFrom     string `db:"asr_from"`
+	AsrTo       string `db:"asr_to"`
+	MaghribFrom string `db:"maghrib_from"`
+	MaghribTo   string `db:"maghrib_to"`
+	IshaFrom    string `db:"isha_from"`
+	IshaTo      string `db:"isha_to"`
 }
 
 type User struct {
-	ChatID   int64
-	RegionID int64
-	Username string
-	Language string
+	ChatID        int64  `db:"chat_id"`
+	RegionID      int    `db:"region_id"`
+	Username      string `db:"username"`
+	Language      string `db:"lang"`
+	LastMessageID int    `db:"last_message_id"`
+	IsDeleted     bool   `db:"is_deleted"`
 }
 
 var SendNotifications map[int]map[int]bool = make(map[int]map[int]bool)
 
-var RegionsID map[string]int = map[string]int{
-	"Душанбе":     0,
-	"Истаравшан":  1,
-	"Куляб":       2,
-	"Худжанд":     3,
-	"Рашт":        4,
-	"Канибадам":   5,
-	"Исфара":      6,
-	"Ашт":         7,
-	"Хорог":       8,
-	"Мургаб":      9,
-	"Кургантюбе":  10,
-	"Пенджикент":  11,
-	"Шахритус":    12,
-	"Айни":        13,
-	"Кӯлоб":       2,
-	"Хуҷанд":      3,
-	"Конибодом":   5,
-	"Хоруғ":       8,
-	"Мурғоб":      9,
-	"Қурғонтеппа": 10,
-	"Панҷакент":   11,
-	"Шаҳритус":    12,
-	"Aйнӣ":        13,
+var RegionsID = map[string]int{
+	"Душанбе":     1,
+	"Истаравшан":  2,
+	"Куляб":       3,
+	"Худжанд":     4,
+	"Рашт":        5,
+	"Канибадам":   6,
+	"Исфара":      7,
+	"Ашт":         8,
+	"Хорог":       9,
+	"Мургаб":      10,
+	"Кургантюбе":  11,
+	"Пенджикент":  12,
+	"Шахритус":    13,
+	"Айни":        14,
+	"Кӯлоб":       3,
+	"Хуҷанд":      4,
+	"Конибодом":   6,
+	"Хоруғ":       9,
+	"Мурғоб":      10,
+	"Қурғонтеппа": 11,
+	"Панҷакент":   12,
+	"Шаҳритус":    13,
+	"Aйнӣ":        14,
 }
 
-var Regions map[string][]string = map[string][]string{
+var Regions = map[string][]string{
 	"ru": {
 		"Душанбе",
 		"Истаравшан",
@@ -117,19 +133,24 @@ var Regions map[string][]string = map[string][]string{
 	},
 }
 
-var RegionsTime map[int]int = map[int]int{
-	0:  0,
-	1:  -5,
+var RegionsTime = map[int]int{
+	1:  0,
 	2:  -5,
-	3:  -7,
+	3:  -5,
 	4:  -7,
-	5:  -9,
+	5:  -7,
 	6:  -9,
 	7:  -9,
-	8:  -12,
-	9:  -20,
-	10: 4,
-	11: 5,
+	8:  -9,
+	9:  -12,
+	10: -20,
+	11: 4,
 	12: 5,
 	13: 5,
+	14: 5,
+}
+
+type Region struct {
+	ID   int    `db:"id"`
+	Name string `db:"region"`
 }

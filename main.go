@@ -1,15 +1,22 @@
 package main
 
 import (
+	"context"
+	"echobot/app"
+	"echobot/handler"
 	"echobot/parser"
-	"echobot/repository"
+	"echobot/pkg/database"
+	"echobot/scheduler"
+	"echobot/storage/postgres"
 	"echobot/telegram"
+	"fmt"
+	"github.com/go-co-op/gocron/v2"
+	"github.com/go-telegram/bot"
+	"github.com/joho/godotenv"
 	"io"
 	"log"
 	"os"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/joho/godotenv"
+	"os/signal"
 )
 
 func main() {
@@ -27,26 +34,41 @@ func main() {
 		log.Printf("error loading env variables: %s", err.Error())
 		return
 	}
-	// Получите токен вашего бота из окружения или укажите его здесь
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
+
+	dbConn, err := database.GetDBConnection(database.Config{
+		User:     os.Getenv("DB_USER"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+	})
 	if err != nil {
-		log.Panic(err.Error())
+		log.Println(fmt.Errorf("error connecting to db: %w", err))
+		return
 	}
 
-	// bot.Debug = true
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
+	storage := postgres.NewPostgresStorage(dbConn)
+	handler := handler.NewHandler(storage)
 	parser := parser.NewParser()
-	db, err := repository.NewSqlite()
-	if err != nil {
-		log.Panic(err.Error())
-	}
-	if err := db.Init(); err != nil {
-		log.Panic(err.Error())
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	opts := []bot.Option{
+		bot.WithDefaultHandler(handler.DefaultHandler),
+		//bot.WithCallbackQueryDataHandler("region", bot.MatchTypePrefix, handler.CallbackHandler),
 	}
 
-	telegramBot := telegram.NewBot(bot, parser, db)
-	if err := telegramBot.Start(); err != nil {
-		log.Fatal(err.Error())
+	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
+	if err != nil {
+		panic(err)
 	}
+	tl := telegram.NewBot(b, handler)
+	sh, err := gocron.NewScheduler()
+	if err != nil {
+		log.Println(err)
+	}
+	scheduler := scheduler.NewScheduler(parser, sh, storage, tl)
+	app := app.NewApp(tl, scheduler)
+	go app.Start(ctx)
+	<-ctx.Done()
+	log.Println("bot stopped")
 }

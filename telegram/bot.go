@@ -1,41 +1,45 @@
 package telegram
 
 import (
-	"echobot/parser"
-	"echobot/repository"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"context"
+	"echobot/handler"
+	"github.com/go-telegram/bot"
 )
 
 type Bot struct {
-	bot    *tgbotapi.BotAPI
-	Parser *parser.Parser
-	db     repository.Repository
+	Bot     *bot.Bot
+	Handler *handler.Handler
 }
 
-func NewBot(bot *tgbotapi.BotAPI, parser *parser.Parser, db *repository.Sqlite) *Bot {
+func NewBot(bot *bot.Bot, handler *handler.Handler) *Bot {
 	return &Bot{
-		bot:    bot,
-		Parser: parser,
-		db:     db,
+		Bot:     bot,
+		Handler: handler,
 	}
 }
 
-func (b *Bot) Start() error {
-	go b.UpdateTimeProcedure()
-	go b.SendRemindersProcedure()
+func (b *Bot) Start(ctx context.Context) {
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, b.Handler.StartHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/time", bot.MatchTypeExact, b.Handler.TimeHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/language", bot.MatchTypeExact, b.Handler.LangHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/region", bot.MatchTypeExact, b.Handler.RegionHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/taqvim", bot.MatchTypeExact, b.Handler.TaqvimHandler)
 
-	updates, err := b.GetUpdatesChannel()
-	if err != nil {
-		return err
-	}
+	b.Bot.RegisterHandlerMatchFunc(isLang, b.Handler.LangHandler)
+	b.Bot.RegisterHandlerMatchFunc(isTime, b.Handler.TimeHandler)
+	b.Bot.RegisterHandlerMatchFunc(isLangButton, b.Handler.ChangeLanguage)
+	b.Bot.RegisterHandlerMatchFunc(isRegionButton, b.Handler.RegionHandler)
+	b.Bot.RegisterHandlerMatchFunc(isTaqvimButton, b.Handler.TaqvimHandler)
 
-	b.handleUpdates(updates)
-	return nil
-}
-
-func (b *Bot) GetUpdatesChannel() (tgbotapi.UpdatesChannel, error) {
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-	return b.bot.GetUpdatesChan(u)
+	b.Bot.Start(ctx)
+	//go b.UpdateTimeProcedure()
+	//go b.SendRemindersProcedure()
+	//
+	//updates, err := b.GetUpdatesChannel()
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//b.handleUpdates(updates)
+	//return nil
 }

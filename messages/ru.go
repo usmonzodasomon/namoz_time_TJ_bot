@@ -1,6 +1,6 @@
 package messages
 
-var RU map[string]string = map[string]string{
+var RU = map[string]string{
 	"UnknownCommand":    "Неизвестная команда, попробуйте другую!",
 	"Welcome":           "Добро пожаловать!\nБот берёт время намазов с сайта Исламского центра Республики Таджикистан.\nНе более чем за 10 минут отправляет напоминание о предшествующем намазе.\nПо поводу вопросов и предложений можно обратиться @usmonzodasomon.\nПриятного использования!",
 	"Today":             "Сегодня",
@@ -14,4 +14,15 @@ var RU map[string]string = map[string]string{
 	"ChooseLanguageBtn": "Выбрать язык",
 	"ChooseRegionBtn":   "Выбрать город",
 	"ChooseLanguage":    "Выберите язык",
+	"Monday":            "Понедельник",
+	"Tuesday":           "Вторник",
+	"Wednesday":         "Среда",
+	"Thursday":          "Четверг",
+	"Friday":            "Пятница",
+	"Saturday":          "Суббота",
+	"Sunday":            "Воскресенье",
+	"Suhur":             "Дуа для сухура",
+	"Iftar":             "Дуа для ифтара",
+	"Taqvim":            "Календарь Священного месяца Рамадан",
+	"Region":            "Город",
 }
