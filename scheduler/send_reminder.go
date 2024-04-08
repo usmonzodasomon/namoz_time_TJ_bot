@@ -187,11 +187,9 @@ func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, 
 		messages.Messages[user.Language]["Time"],
 		messages.Messages[user.Language]["IntervalFrom"],
 		getNamazTimeWithNamazID(namazTime, namazID).From.
-			Add(time.Minute*time.Duration(types.RegionsTime[regionID])).
 			Format("15:04"), // находим время намаза для региона
 		messages.Messages[user.Language]["IntervalTo"],
 		getNamazTimeWithNamazID(namazTime, namazID).To.
-			Add(time.Minute*time.Duration(types.RegionsTime[regionID])).
 			Format("15:04")) // находим время истечения намаза для региона
 	if namazID == 0 {
 		msg = fmt.Sprintf("<b>🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n%s: %s</b>\n\n🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n", messages.Messages[user.Language]["Suhur"], "Валисавми ғаддин мин шаҳри  рамазоналлазӣ фаризатан навайту.") + msg
