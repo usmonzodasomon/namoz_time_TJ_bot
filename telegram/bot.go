@@ -32,14 +32,4 @@ func (b *Bot) Start(ctx context.Context) {
 	b.Bot.RegisterHandlerMatchFunc(isTaqvimButton, b.Handler.TaqvimHandler)
 
 	b.Bot.Start(ctx)
-	//go b.UpdateTimeProcedure()
-	//go b.SendRemindersProcedure()
-	//
-	//updates, err := b.GetUpdatesChannel()
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//b.handleUpdates(updates)
-	//return nil
 }
