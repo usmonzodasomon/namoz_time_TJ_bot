@@ -13,6 +13,7 @@ import (
 )
 
 var ErrBlockUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: bot was blocked by the user"}`)
+var ErrDeactivateUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: user is deactivated"}`)
 
 func (s *Scheduler) SendReminders() {
 	date := time.Now().Format("02.01.2006")
@@ -161,7 +162,8 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, namazTime))
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
-		if err.Error() == ErrBlockUser.Error() {
+		if err.Error() == ErrBlockUser.Error() ||
+			err.Error() == ErrDeactivateUser.Error() {
 			log.Println("deleting user: ", user.ChatID)
 			if err := s.storage.DeleteUser(user.ChatID); err != nil {
 				log.Println(err.Error())
