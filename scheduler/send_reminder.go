@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-var ErrBlockUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: bot was blocked by the user"}`)
-var ErrDeactivateUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: user is deactivated"}`)
+var ErrBlockUser = errors.New(`forbidden, Forbidden: bot was blocked by the user`)
+var ErrDeactivateUser = errors.New(`forbidden, Forbidden: user is deactivated`)
 
 func (s *Scheduler) SendReminders() {
 	date := time.Now().Format("02.01.2006")
