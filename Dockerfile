@@ -9,5 +9,8 @@ FROM alpine:3.19.1
 WORKDIR /home/namazbot
 COPY --from=builder /home/namazbot .
 ENV TZ="Asia/Dushanbe"
+
+RUN apk add --no-cache tzdata
+
 RUN chmod +x ./main
 CMD ["./main"]
