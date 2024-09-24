@@ -39,7 +39,7 @@ func (s *Scheduler) Start() {
 		log.Println(err)
 	}
 	_, err = s.sh.NewJob(
-		gocron.DurationJob(3*time.Minute),
+		gocron.DurationJob(time.Minute),
 		gocron.NewTask(
 			s.SendReminders,
 		),
