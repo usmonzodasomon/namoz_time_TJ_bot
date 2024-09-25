@@ -9,6 +9,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -137,9 +138,28 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 		return err
 	}
 
-	for _, user := range users {
-		s.SendMessageForUser(user, namazID, regionID, namazTime)
+	//* Testing some hypothesis
+	ch := make(chan types.User)
+	wg := &sync.WaitGroup{}
+	go func(ch chan types.User) {
+		for _, user := range users {
+			ch <- user
+		}
+		close(ch)
+	}(ch)
+
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func() {
+			for user := range ch {
+				s.SendMessageForUser(user, namazID, regionID, namazTime)
+			}
+		}()
 	}
+	wg.Done()
+	//for _, user := range users {
+	//	s.SendMessageForUser(user, namazID, regionID, namazTime)
+	//}
 	return nil
 }
 
