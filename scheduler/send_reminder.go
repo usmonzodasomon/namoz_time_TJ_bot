@@ -136,7 +136,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 	if err != nil {
 		return err
 	}
-	fmt.Println(users)
+	log.Println(len(users))
 
 	for _, user := range users {
 		s.SendMessageForUser(user, namazID, regionID, namazTime)
@@ -145,9 +145,12 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 }
 
 func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, namazTime types.NamazTime) {
+	now := time.Now()
 	if err := s.DeleteMessage(user.ChatID, user.LastMessageID); err != nil {
 		log.Println("Error deleting message: ", err)
 	}
+
+	log.Println("deleting messages: ", time.Since(now))
 
 	if namazID == 0 {
 		s.telegram.Handler.TimeHandler(context.Background(), s.telegram.Bot, &models.Update{
@@ -158,7 +161,7 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 			},
 		})
 	}
-
+	now = time.Now()
 	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, namazTime))
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
@@ -171,6 +174,8 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 		}
 		return
 	}
+	log.Println("sending messages: ", time.Since(now))
+	now = time.Now()
 
 	if err := s.storage.UpdateUser(types.User{
 		ChatID:        user.ChatID,
@@ -178,6 +183,7 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 	}); err != nil {
 		log.Println("error updating message id: ", err.Error())
 	}
+	log.Println("updating messages: ", time.Since(now))
 }
 
 func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, namazTime types.NamazTime) *bot.SendMessageParams {
