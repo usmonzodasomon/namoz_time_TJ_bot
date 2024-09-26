@@ -13,8 +13,11 @@ import (
 	"time"
 )
 
-var ErrBlockUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: bot was blocked by the user"}`)
-var ErrDeactivateUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: user is deactivated"}`)
+var (
+	ErrBlockUser      = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: bot was blocked by the user"}`)
+	ErrDeactivateUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: user is deactivated"}`)
+	ErrChatNotFound   = errors.New(`unexpected response statusCode 400 for method sendMessage, {"ok":false,"error_code":400,"description":"Bad Request: chat not found"}"`)
+)
 
 func (s *Scheduler) SendReminders() {
 	date := time.Now().Format("02.01.2006")
@@ -148,7 +151,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 		close(ch)
 	}(ch)
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 7; i++ {
 		wg.Add(1)
 		go func() {
 			for user := range ch {
@@ -157,9 +160,6 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 		}()
 	}
 	wg.Done()
-	//for _, user := range users {
-	//	s.SendMessageForUser(user, namazID, regionID, namazTime)
-	//}
 	return nil
 }
 
@@ -182,7 +182,8 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
 		if err.Error() == ErrBlockUser.Error() ||
-			err.Error() == ErrDeactivateUser.Error() {
+			err.Error() == ErrDeactivateUser.Error() ||
+			err.Error() == ErrChatNotFound.Error() {
 			log.Println("deleting user: ", user.ChatID)
 			if err := s.storage.DeleteUser(user.ChatID); err != nil {
 				log.Println(err.Error())
