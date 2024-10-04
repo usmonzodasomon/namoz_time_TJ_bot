@@ -151,7 +151,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 		close(ch)
 	}(ch)
 
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func() {
 			for user := range ch {
