@@ -2,12 +2,13 @@ package handler
 
 import (
 	"context"
-	"echobot/messages"
 	"fmt"
+	"log"
+
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"log"
-	"strconv"
+
+	"echobot/messages"
 )
 
 func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -17,10 +18,9 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 		user.Language = "tj"
 	}
 
-	_, err = b.CopyMessage(ctx, &bot.CopyMessageParams{
+	_, err = b.SendPhoto(ctx, &bot.SendPhotoParams{
 		ChatID:      update.Message.Chat.ID,
-		FromChatID:  strconv.FormatInt(1073064760, 10),
-		MessageID:   269545,
+		Photo:       models.InputFileString{Data: "AgACAgIAAxkBAAE-McFnwdCAhqF7jCNOEIMh1H3pssYl9AACc_ExGzDvEErEkzsnLELdoAEAAwIAA3kAAzYE"},
 		Caption:     messages.Messages[user.Language]["Taqvim"],
 		ReplyMarkup: inlineButtonMain(user.Language),
 	})
