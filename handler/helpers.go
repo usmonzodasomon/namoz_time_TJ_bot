@@ -1,11 +1,13 @@
 package handler
 
 import (
-	"echobot/messages"
-	"echobot/types"
-	"github.com/go-telegram/bot/models"
 	"log"
 	"time"
+
+	"github.com/go-telegram/bot/models"
+
+	"echobot/messages"
+	"echobot/types"
 )
 
 func (h *Handler) GetNamazTimeForCurrentRegion(namazTime types.NamazTime, regionID int) types.NamazTime {
@@ -81,6 +83,9 @@ func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
 			}, {
 				{Text: "🇹🇯 " + messages.Messages[lang]["ChooseLanguageBtn"]},
 				{Text: "🏙 " + messages.Messages[lang]["ChooseRegionBtn"]},
+			},
+			{
+				{Text: "🕌 " + messages.Messages[lang]["Taqvim"]},
 			},
 		},
 		ResizeKeyboard: true,
