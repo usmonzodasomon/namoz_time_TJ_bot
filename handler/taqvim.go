@@ -20,7 +20,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 
 	_, err = b.SendPhoto(ctx, &bot.SendPhotoParams{
 		ChatID:      update.Message.Chat.ID,
-		Photo:       models.InputFileString{Data: "AgACAgIAAxkBAAE-McFnwdCAhqF7jCNOEIMh1H3pssYl9AACc_ExGzDvEErEkzsnLELdoAEAAwIAA3kAAzYE"},
+		Photo:       &models.InputFileString{Data: "AgACAgIAAxkBAAE-McFnwdCAhqF7jCNOEIMh1H3pssYl9AACc_ExGzDvEErEkzsnLELdoAEAAwIAA3kAAzYE"},
 		Caption:     messages.Messages[user.Language]["Taqvim"],
 		ReplyMarkup: inlineButtonMain(user.Language),
 	})
