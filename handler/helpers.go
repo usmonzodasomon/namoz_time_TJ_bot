@@ -84,9 +84,6 @@ func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
 				{Text: "🇹🇯 " + messages.Messages[lang]["ChooseLanguageBtn"]},
 				{Text: "🏙 " + messages.Messages[lang]["ChooseRegionBtn"]},
 			},
-			{
-				{Text: "🕌 " + messages.Messages[lang]["Taqvim"]},
-			},
 		},
 		ResizeKeyboard: true,
 		Selective:      true,

@@ -216,13 +216,6 @@ func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, 
 		getNamazTimeWithNamazID(namazTime, namazID).To.
 			Format("15:04")) // находим время истечения намаза для региона
 
-	if namazID == 0 {
-		msg = fmt.Sprintf("<b>🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n%s: %s</b>\n\n🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n", messages.Messages[user.Language]["Suhur"], "Валисавми ғаддин мин шаҳри  рамазоналлазӣ фаризатан навайту.") + msg
-	} else if namazID == 3 {
-		msg = fmt.Sprintf("<b>🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n%s: %s</b>\n\n🌙  🌙  🌙  🌙 🌙 🌙  🌙  🌙  🌙 🌙 🌙\n\n", messages.Messages[user.Language]["Iftar"], "Аллоҳума лака сумту ва бика оманту ва алайка таваккалту ва ало ризқика афтарту.") + msg
-
-	}
-	
 	return &bot.SendMessageParams{
 		ChatID:    user.ChatID,
 		Text:      msg,

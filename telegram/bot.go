@@ -23,13 +23,11 @@ func (b *Bot) Start(ctx context.Context) {
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/time", bot.MatchTypeExact, b.Handler.TimeHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/language", bot.MatchTypeExact, b.Handler.LangHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/region", bot.MatchTypeExact, b.Handler.RegionHandler)
-	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/taqvim", bot.MatchTypeExact, b.Handler.TaqvimHandler)
 
 	b.Bot.RegisterHandlerMatchFunc(isLang, b.Handler.LangHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTime, b.Handler.TimeHandler)
 	b.Bot.RegisterHandlerMatchFunc(isLangButton, b.Handler.ChangeLanguage)
 	b.Bot.RegisterHandlerMatchFunc(isRegionButton, b.Handler.RegionHandler)
-	b.Bot.RegisterHandlerMatchFunc(isTaqvimButton, b.Handler.TaqvimHandler)
 
 	b.Bot.Start(ctx)
 }
