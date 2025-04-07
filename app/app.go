@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
-	"echobot/scheduler"
-	"echobot/telegram"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/scheduler"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/telegram"
 )
 
 type App struct {

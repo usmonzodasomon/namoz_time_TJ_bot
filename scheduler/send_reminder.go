@@ -11,8 +11,8 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"echobot/messages"
-	"echobot/types"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 )
 
 var (

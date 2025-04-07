@@ -1,10 +1,10 @@
 package scheduler
 
 import (
-	"echobot/parser"
-	"echobot/storage"
-	"echobot/telegram"
 	"github.com/go-co-op/gocron/v2"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/parser"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/storage"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/telegram"
 	"log"
 	"time"
 )

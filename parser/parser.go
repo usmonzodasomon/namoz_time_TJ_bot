@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bytes"
-	"echobot/types"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 	"io"
 	"net/http"
 	"net/url"

@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"echobot/types"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 )
 
 type Storage interface {

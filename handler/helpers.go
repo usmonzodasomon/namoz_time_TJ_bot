@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-telegram/bot/models"
 
-	"echobot/messages"
-	"echobot/types"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 )
 
 func (h *Handler) GetNamazTimeForCurrentRegion(namazTime types.NamazTime, regionID int) types.NamazTime {

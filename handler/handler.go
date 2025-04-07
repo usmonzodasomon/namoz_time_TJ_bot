@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"echobot/storage"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/storage"
 )
 
 type Handler struct {

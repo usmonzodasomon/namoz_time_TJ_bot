@@ -2,10 +2,10 @@ package postgres
 
 import (
 	"database/sql"
-	"echobot/types"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 	"strings"
 )
 

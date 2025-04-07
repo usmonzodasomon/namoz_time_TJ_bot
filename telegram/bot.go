@@ -2,8 +2,8 @@ package telegram
 
 import (
 	"context"
-	"echobot/handler"
 	"github.com/go-telegram/bot"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/handler"
 )
 
 type Bot struct {

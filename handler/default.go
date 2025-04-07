@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"echobot/messages"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
 	"log"
 )
 

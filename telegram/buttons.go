@@ -1,8 +1,8 @@
 package telegram
 
 import (
-	"echobot/messages"
 	"github.com/go-telegram/bot/models"
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
 )
 
 func isLang(update *models.Update) bool {
