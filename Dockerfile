@@ -10,8 +10,8 @@ WORKDIR /home/namazbot
 
 # Установка Chromium и зависимостей
 RUN apk update && apk add --no-cache \
-    chromium \
-    chromium-chromedriver \
+    chromium=118.0.5993.117-r0 \
+    chromium-chromedriver=118.0.5993.117-r0 \
     harfbuzz \
     nss \
     freetype \
