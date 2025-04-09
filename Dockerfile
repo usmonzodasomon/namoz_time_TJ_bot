@@ -29,7 +29,4 @@ COPY --from=builder /home/namazbot .
 # Делаем исполняемым
 RUN chmod +x ./main
 
-# Возвращаемся к non-root пользователю (важно для безопасности)
-USER chrome
-
 CMD ["./main"]
