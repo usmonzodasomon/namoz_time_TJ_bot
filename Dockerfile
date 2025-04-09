@@ -9,7 +9,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 # Этап 2: Используем готовый образ с Chrome
-FROM zenika/alpine-chrome:with-puppeteer
+FROM zenika/alpine-chrome@sha256:9b3e4cb7a83f2f5e2c2176d29a2d631c693f42bfc173e13fd00578c83cf99bbf
 
 WORKDIR /home/namazbot
 
