@@ -1,35 +1,31 @@
-FROM golang:1.24.2 AS builder
-WORKDIR /home/namazbot
-COPY . .
+# Stage 1: Сборка Go-приложения
+FROM golang:1.21 AS builder
 
+WORKDIR /app
+
+# Копируем go.mod и go.sum отдельно для кэширования зависимостей
+COPY go.mod go.sum ./
 RUN go mod download
+
+# Копируем остальной код и собираем
+COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-FROM alpine:3.19.1
-WORKDIR /home/namazbot
+# Stage 2: Финальный образ с Chrome
+FROM zenika/alpine-chrome:with-puppeteer
 
-# Установка Chromium и зависимостей
-RUN apk update && apk add --no-cache \
-    chromium=118.0.5993.117-r0 \
-    chromium-chromedriver=118.0.5993.117-r0 \
-    harfbuzz \
-    nss \
-    freetype \
-    ttf-freefont \
-    font-noto-emoji \
-    wqy-zenhei \
-    tzdata
+WORKDIR /app
 
-# Настройка переменных окружения
+# Устанавливаем переменные окружения
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/ \
-    TZ="Asia/Dushanbe"
+    TZ=Asia/Dushanbe
 
-# Копирование собранного приложения
-COPY --from=builder /home/namazbot .
+# Копируем собранное приложение
+COPY --from=builder /app/main .
 
-# Разрешения на выполнение
+# Разрешаем запуск
 RUN chmod +x ./main
 
-# Запуск приложения
+# Запускаем
 CMD ["./main"]
