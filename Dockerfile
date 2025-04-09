@@ -7,10 +7,29 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 FROM alpine:3.19.1
 WORKDIR /home/namazbot
+
+# Установка Chromium и зависимостей
+RUN apk update && apk add --no-cache \
+    chromium \
+    chromium-chromedriver \
+    harfbuzz \
+    nss \
+    freetype \
+    ttf-freefont \
+    font-noto-emoji \
+    wqy-zenhei \
+    tzdata
+
+# Настройка переменных окружения
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/ \
+    TZ="Asia/Dushanbe"
+
+# Копирование собранного приложения
 COPY --from=builder /home/namazbot .
-ENV TZ="Asia/Dushanbe"
 
-RUN apk add --no-cache tzdata
-
+# Разрешения на выполнение
 RUN chmod +x ./main
+
+# Запуск приложения
 CMD ["./main"]
