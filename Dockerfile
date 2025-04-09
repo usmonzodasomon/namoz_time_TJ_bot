@@ -13,17 +13,23 @@ FROM zenika/alpine-chrome:with-puppeteer
 
 WORKDIR /home/namazbot
 
-# Устанавливаем переменные окружения
+# Временно переключаемся на root
+USER root
+
+# Устанавливаем переменные окружения и часовой пояс
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/ \
     TZ="Asia/Dushanbe"
 
-# Установка часового пояса
 RUN apk add --no-cache tzdata
 
 # Копируем собранное приложение
 COPY --from=builder /home/namazbot/main .
 
-# Делаем исполняемым и запускаем
+# Делаем исполняемым
 RUN chmod +x ./main
+
+# Возвращаемся к non-root пользователю (важно для безопасности)
+USER chrome
+
 CMD ["./main"]
