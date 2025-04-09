@@ -19,4 +19,4 @@ ENV TZ="Asia/Dushanbe"
 # Права на выполнение
 RUN chmod +x ./main
 
-CMD ["./main"]
+ENTRYPOINT ["./main"]
