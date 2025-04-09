@@ -10,10 +10,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 FROM chromedp/headless-shell:latest
 WORKDIR /home/namazbot
 COPY --from=builder /home/namazbot .
-ENV TZ="Asia/Dushanbe"
 
-# Устанавливаем часовой пояс
-RUN apk add --no-cache tzdata
+# Устанавливаем пакеты, включая tzdata
+RUN apt-get update && apt-get install -y tzdata
+
+ENV TZ="Asia/Dushanbe"
 
 # Права на выполнение
 RUN chmod +x ./main
