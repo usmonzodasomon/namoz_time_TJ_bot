@@ -1,31 +1,29 @@
-# Stage 1: Сборка Go-приложения
-FROM golang:1.21 AS builder
+# Этап 1: Сборка Go-приложения
+FROM golang:1.24.2 AS builder
 
-WORKDIR /app
-
-# Копируем go.mod и go.sum отдельно для кэширования зависимостей
+WORKDIR /home/namazbot
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Копируем остальной код и собираем
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Stage 2: Финальный образ с Chrome
+# Этап 2: Используем готовый образ с Chrome
 FROM zenika/alpine-chrome:with-puppeteer
 
-WORKDIR /app
+WORKDIR /home/namazbot
 
 # Устанавливаем переменные окружения
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/ \
-    TZ=Asia/Dushanbe
+    TZ="Asia/Dushanbe"
+
+# Установка часового пояса
+RUN apk add --no-cache tzdata
 
 # Копируем собранное приложение
-COPY --from=builder /app/main .
+COPY --from=builder /home/namazbot/main .
 
-# Разрешаем запуск
+# Делаем исполняемым и запускаем
 RUN chmod +x ./main
-
-# Запускаем
 CMD ["./main"]
