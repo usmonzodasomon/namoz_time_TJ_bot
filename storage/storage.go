@@ -11,8 +11,10 @@ type Storage interface {
 	UpdateUser(user types.User) error
 	DeleteUser(chatID int64) error
 	GetNamazTime(date string) (types.NamazTime, error)
+	GetTaqvimTime() (types.TaqvimTime, error)
 	GetRegionByID(lang string, id int) (types.Region, error)
 	UpdateNamazTime(namazTime []types.NamazTime) error
+	UpdateTaqvimTime(taqvimTime types.TaqvimTime) error
 	//GetRegionID(chatID int64) (int, error)
 	//GetLang(chatID int64) (string, error)
 	//UpdateRegionID(chatID int64, regionID int) error

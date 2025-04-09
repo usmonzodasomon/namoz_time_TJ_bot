@@ -61,6 +61,14 @@ type NamazTime struct {
 	IshaTo      string `db:"isha_to"`
 }
 
+type TaqvimTime struct {
+	Fajr    string `db:"fajr"`
+	Zuhr    string `db:"zuhr"`
+	Asr     string `db:"asr"`
+	Maghrib string `db:"maghrib"`
+	Isha    string `db:"isha"`
+}
+
 type User struct {
 	ChatID        int64  `db:"chat_id"`
 	RegionID      int    `db:"region_id"`

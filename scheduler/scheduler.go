@@ -26,8 +26,9 @@ func NewScheduler(parser *parser.Parser, scheduler gocron.Scheduler, storage sto
 }
 
 func (s *Scheduler) Start() {
-	s.UpdateTime()
-	s.SendReminders()
+	go s.UpdateTaqvimTime()
+	go s.UpdateTime()
+	go s.SendReminders()
 
 	_, err := s.sh.NewJob(
 		gocron.CronJob("0 */6 * * *", false),
@@ -38,6 +39,7 @@ func (s *Scheduler) Start() {
 	if err != nil {
 		log.Println(err)
 	}
+
 	_, err = s.sh.NewJob(
 		gocron.DurationJob(time.Minute),
 		gocron.NewTask(
@@ -45,9 +47,19 @@ func (s *Scheduler) Start() {
 		),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule),
 	)
-
 	if err != nil {
 		log.Println(err)
 	}
+
+	_, err = s.sh.NewJob(
+		gocron.CronJob("5 0 * * *", false),
+		gocron.NewTask(
+			s.UpdateTaqvimTime,
+		),
+	)
+	if err != nil {
+		log.Println(err)
+	}
+
 	s.sh.Start()
 }
