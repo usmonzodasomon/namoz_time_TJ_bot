@@ -42,8 +42,6 @@ func getNamazTimes() (string, error) {
 		chromedp.Flag("headless", true),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-sandbox", true),
-		chromedp.Flag("disable-dev-shm-usage", true),
-		chromedp.ExecPath("/usr/bin/chromium-browser"), // Путь к Chromium в Alpine
 	)
 
 	// Create context with options
