@@ -24,7 +24,7 @@ ENV CHROME_BIN=/usr/bin/chromium-browser \
 RUN apk add --no-cache tzdata
 
 # Копируем собранное приложение
-COPY --from=builder /home/namazbot/main .
+COPY --from=builder /home/namazbot .
 
 # Делаем исполняемым
 RUN chmod +x ./main
