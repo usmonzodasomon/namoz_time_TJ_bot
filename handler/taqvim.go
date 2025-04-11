@@ -3,10 +3,12 @@ package handler
 import (
 	"context"
 	"fmt"
-	"github.com/chromedp/chromedp"
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
