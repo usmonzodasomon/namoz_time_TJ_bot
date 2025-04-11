@@ -154,7 +154,7 @@ func (s *Storage) UpdateTaqvimTime(taqvimTime types.TaqvimTime) error {
 
 	q = `INSERT INTO taqvim_time(fajr, zuhr, asr, maghrib, isha) VALUES ($1, $2, $3, $4, $5)`
 
-	_, err = s.db.Exec(q, taqvimTime.Fajr, taqvimTime.Zuhr, taqvimTime.Asr, taqvimTime.Maghrib)
+	_, err = s.db.Exec(q, taqvimTime.Fajr, taqvimTime.Zuhr, taqvimTime.Asr, taqvimTime.Maghrib, taqvimTime.Isha)
 	if err != nil {
 		return err
 	}
