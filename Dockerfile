@@ -29,7 +29,6 @@ RUN apk add --no-cache \
     # Убираем лишнее, чтобы уменьшить размер
     && rm -rf /var/cache/apk/*
 
-# Прочие настройки
 RUN chmod +x ./main
 
 CMD ["./main"]
