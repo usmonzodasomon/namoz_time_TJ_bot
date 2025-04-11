@@ -66,7 +66,7 @@ type TaqvimTime struct {
 	Zuhr    string `db:"zuhr"`
 	Asr     string `db:"asr"`
 	Maghrib string `db:"maghrib"`
-	Isha    string `db:"isha_from"`
+	Isha    string `db:"isha"`
 }
 
 type User struct {
