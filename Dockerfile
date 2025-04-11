@@ -1,5 +1,4 @@
-# Используем Go на базе Alpine
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24.2 AS builder
 
 WORKDIR /home/namazbot
 COPY . .
@@ -7,27 +6,23 @@ COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Финальный контейнер
 FROM alpine:3.19.1
 
 WORKDIR /home/namazbot
 COPY --from=builder /home/namazbot .
 
-# Настройки окружения
 ENV TZ="Asia/Dushanbe"
 ENV ROD_BROWSER_PATH=/usr/bin/chromium-browser
 
-# Установка зависимостей и Chromium
 RUN apk add --no-cache \
+    tzdata \
     chromium \
     nss \
     freetype \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    && update-ca-certificates \
-    # Убираем лишнее, чтобы уменьшить размер
-    && rm -rf /var/cache/apk/*
+    && update-ca-certificates
 
 RUN chmod +x ./main
 
