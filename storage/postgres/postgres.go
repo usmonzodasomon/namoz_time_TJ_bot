@@ -104,7 +104,7 @@ func (s *Storage) GetNamazTime(date string) (types.NamazTime, error) {
 func (s *Storage) GetTaqvimTime() (types.TaqvimTime, error) {
 	q := "SELECT * FROM taqvim_time"
 	var taqvimTime types.TaqvimTime
-	err := s.db.Select(&taqvimTime, q)
+	err := s.db.Get(&taqvimTime, q)
 	return taqvimTime, err
 }
 
