@@ -37,51 +37,44 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 }
 
 func getNamazTimes() (string, error) {
-	// ChromeDP options
-	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
-		chromedp.Flag("disable-gpu", true),
-		chromedp.Flag("no-sandbox", true),
-	)
+	url := launcher.New().
+		Bin("/usr/bin/chromium-browser").
+		Headless(true).
+		NoSandbox(true).
+		MustLaunch()
 
-	// Create context with options
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
-	defer cancel()
+	browser := rod.New().ControlURL(url).MustConnect()
+	defer browser.MustClose()
 
-	// Create browser context
-	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(log.Printf))
-	defer cancel()
+	// Загружаем страницу
+	page := browser.MustPage("http://www.taqvim.tj/")
+	page.MustWaitLoad()
+	time.Sleep(5 * time.Second) // подождём, пока загрузится JS
 
-	// Set timeout
-	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
-	defer cancel()
-
-	// Variable to store HTML
-	var htmlContent string
-
-	// Get HTML from the page
-	fmt.Println("Starting page loading...")
-	err := chromedp.Run(ctx,
-		chromedp.Navigate("http://www.taqvim.tj/"),
-		chromedp.WaitVisible("body", chromedp.ByQuery),
-		chromedp.Sleep(5*time.Second),
-		chromedp.OuterHTML("html", &htmlContent),
-	)
+	// Получаем HTML-контент страницы
+	htmlContent, err := page.HTML()
 	if err != nil {
-		return "", fmt.Errorf("browser error: %v", err)
+		return "", fmt.Errorf("failed to get HTML: %v", err)
+	}
+
+	// Сохраняем HTML для отладки
+	err = os.WriteFile("NamazTime.html", []byte(htmlContent), 0644)
+	if err != nil {
+		log.Printf("Warning: could not save HTML to file: %v", err)
 	}
 
 	fmt.Println("Parsing prayer times from the central mosque...")
+
+	// Парсим HTML
 	masjidiMarkaziTimes, err := getMasjidiMarkaziTimes(htmlContent)
 	if err == nil {
 		fmt.Println("Found prayer times for the central mosque")
 		return masjidiMarkaziTimes, nil
 	}
-	return "error", nil
+	return "Sorry, information not found. Check the NamazTime.html file for debugging.", nil
 }
 
 func getMasjidiMarkaziTimes(htmlContent string) (string, error) {
-	// Regular expression to find the central mosque table
 	pattern := regexp.MustCompile(`<table id="table_namoz_time_today">.*?Вақтҳои намоз дар масҷиди Марказии шаҳри Душанбе.*?</table>`)
 	tableHTML := pattern.FindString(htmlContent)
 
@@ -89,7 +82,6 @@ func getMasjidiMarkaziTimes(htmlContent string) (string, error) {
 		return "", fmt.Errorf("central mosque prayer times table not found")
 	}
 
-	// Parse date
 	datePattern := regexp.MustCompile(`Имрӯз: (\d{2}-\d{2}-\d{4})`)
 	dateMatch := datePattern.FindStringSubmatch(tableHTML)
 	date := ""
@@ -97,7 +89,6 @@ func getMasjidiMarkaziTimes(htmlContent string) (string, error) {
 		date = dateMatch[1]
 	}
 
-	// Parse prayer times
 	prayerPattern := regexp.MustCompile(`<th class="th_namoz_time_today">(Бомдод|Пешин|Аср|Шом|Хуфтан)</th><td class="td_namoz_time_today">(\d{2}:\d{2})</td>`)
 	prayerMatches := prayerPattern.FindAllStringSubmatch(tableHTML, -1)
 
@@ -105,7 +96,6 @@ func getMasjidiMarkaziTimes(htmlContent string) (string, error) {
 		return "", fmt.Errorf("prayer times not found in the table")
 	}
 
-	// Format response
 	var response strings.Builder
 	response.WriteString(fmt.Sprintf("Вақтҳои намоз дар масҷиди Марказии шаҳри Душанбе, Имрӯз: %s\n", date))
 

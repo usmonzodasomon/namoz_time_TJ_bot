@@ -1,24 +1,29 @@
-# Этап 1: Собираем приложение Go
 FROM golang:1.24.2 AS builder
+
 WORKDIR /home/namazbot
 COPY . .
 
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Этап 2: Используем образ с headless-shell
-FROM chromedp/headless-shell:latest
+FROM alpine:3.19.1
+
 WORKDIR /home/namazbot
 COPY --from=builder /home/namazbot .
 
-# Устанавливаем пакеты, включая tzdata
-RUN apt-get update && apt-get install -y tzdata ca-certificates
-
-# Устанавливаем часовой пояс
 ENV TZ="Asia/Dushanbe"
+ENV ROD_BROWSER_PATH=/usr/bin/chromium-browser
 
-# Права на выполнение
+RUN apk add --no-cache \
+    tzdata \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    && update-ca-certificates
+
 RUN chmod +x ./main
 
-# Запуск с параметром --no-sandbox
-ENTRYPOINT ["./main", "--no-sandbox"]
+CMD ["./main"]
