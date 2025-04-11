@@ -101,6 +101,13 @@ func (s *Storage) GetNamazTime(date string) (types.NamazTime, error) {
 	return namazTime, err
 }
 
+func (s *Storage) GetTaqvimTime() (types.TaqvimTime, error) {
+	q := "SELECT * FROM taqvim_time"
+	var taqvimTime types.TaqvimTime
+	err := s.db.Select(&taqvimTime, q)
+	return taqvimTime, err
+}
+
 func (s *Storage) GetRegionByID(lang string, id int) (types.Region, error) {
 	var region types.Region
 	switch lang {
@@ -132,6 +139,22 @@ func (s *Storage) UpdateNamazTime(namazTime []types.NamazTime) error {
 				:asr_to, :maghrib_from, :maghrib_to, :isha_from, :isha_to)`
 
 	_, err = s.db.NamedExec(q, namazTime)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) UpdateTaqvimTime(taqvimTime types.TaqvimTime) error {
+	q := `DELETE FROM taqvim_time WHERE 1 = 1`
+	_, err := s.db.Exec(q)
+	if err != nil {
+		return err
+	}
+
+	q = `INSERT INTO taqvim_time(fajr, zuhr, asr, maghrib, isha) VALUES ($1, $2, $3, $4, $5)`
+
+	_, err = s.db.Exec(q, taqvimTime.Fajr, taqvimTime.Zuhr, taqvimTime.Asr, taqvimTime.Maghrib)
 	if err != nil {
 		return err
 	}
