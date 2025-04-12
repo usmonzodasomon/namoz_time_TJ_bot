@@ -9,23 +9,16 @@ import (
 	"strings"
 )
 
-const urlString = "https://shuroiulamo.tj/tj/namaz/ntime"
+const shuroiulamoUrl = "https://shuroiulamo.tj/tj/namaz/ntime"
 
-type Parser struct {
-}
-
-func NewParser() *Parser {
-	return &Parser{}
-}
-
-func (p *Parser) Parse(month, year string) ([]types.NamazTime, error) {
+func GetShuroNamazTimes(month, year string) ([]types.NamazTime, error) {
 	formData := url.Values{}
 	formData.Set("fmonth", month)
 	formData.Set("fyear", year)
 	formData.Set("fday", "0")
 
 	// Отправка POST-запроса
-	response, err := http.Post(urlString, "application/x-www-form-urlencoded", bytes.NewBufferString(formData.Encode()))
+	response, err := http.Post(shuroiulamoUrl, "application/x-www-form-urlencoded", bytes.NewBufferString(formData.Encode()))
 	if err != nil {
 		return nil, err
 	}

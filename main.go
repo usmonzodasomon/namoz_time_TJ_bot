@@ -8,7 +8,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/app"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/handler"
-	"github.com/usmonzodasomon/namoz_time_TJ_bot/parser"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/pkg/database"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/scheduler"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/storage/postgres"
@@ -49,7 +48,6 @@ func main() {
 
 	storage := postgres.NewPostgresStorage(dbConn)
 	handler := handler.NewHandler(storage)
-	parser := parser.NewParser()
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 	opts := []bot.Option{
@@ -65,7 +63,7 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	scheduler := scheduler.NewScheduler(parser, sh, storage, tl)
+	scheduler := scheduler.NewScheduler(sh, storage, tl)
 	app := app.NewApp(tl, scheduler)
 	go app.Start(ctx)
 	<-ctx.Done()

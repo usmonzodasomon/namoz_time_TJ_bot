@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"github.com/usmonzodasomon/namoz_time_TJ_bot/parser"
 	"log"
 	"time"
 )
@@ -8,7 +9,7 @@ import (
 func (s *Scheduler) UpdateTime() {
 	now := time.Now().Format("02.01.2006")
 
-	namazTimeSl, err := s.parser.Parse(now[3:5], now[6:])
+	namazTimeSl, err := parser.GetShuroNamazTimes(now[3:5], now[6:])
 	if err != nil {
 		log.Println(err)
 		return
