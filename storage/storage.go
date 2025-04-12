@@ -15,10 +15,4 @@ type Storage interface {
 	GetRegionByID(lang string, id int) (types.Region, error)
 	UpdateNamazTime(namazTime []types.NamazTime) error
 	UpdateTaqvimTime(taqvimTime types.TaqvimTime) error
-	//GetRegionID(chatID int64) (int, error)
-	//GetLang(chatID int64) (string, error)
-	//UpdateRegionID(chatID int64, regionID int) error
-	//UpdateLanguage(chatID int64, language string) error
-	//UpdateLastMessageID(chatID int64, lastMessageID int) error
-	//GetLastMessageID(chatID int64) (int, error)
 }
