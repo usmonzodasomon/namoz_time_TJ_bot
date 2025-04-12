@@ -54,7 +54,6 @@ func main() {
 	defer cancel()
 	opts := []bot.Option{
 		bot.WithDefaultHandler(handler.DefaultHandler),
-		//bot.WithCallbackQueryDataHandler("region", bot.MatchTypePrefix, handler.CallbackHandler),
 	}
 
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
