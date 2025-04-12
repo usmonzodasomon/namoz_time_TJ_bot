@@ -24,6 +24,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 		log.Println(err)
 		return
 	}
+	fmt.Println(taqvimTime)
 
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
