@@ -26,10 +26,11 @@ func (h *Handler) MailingMeHandler(ctx context.Context, b *bot.Bot, update *mode
 		}
 	}
 
-	_, err = b.ForwardMessage(ctx, &bot.ForwardMessageParams{
-		ChatID:     update.Message.Chat.ID,
-		FromChatID: update.Message.Chat.ID,
-		MessageID:  update.Message.ReplyToMessage.ID,
+	_, err = b.CopyMessage(ctx, &bot.CopyMessageParams{
+		ChatID:      update.Message.Chat.ID,
+		FromChatID:  update.Message.Chat.ID,
+		MessageID:   update.Message.ReplyToMessage.ID,
+		ReplyMarkup: inlineButtonMain(user.Language),
 	})
 	if err != nil {
 		log.Println(err)
