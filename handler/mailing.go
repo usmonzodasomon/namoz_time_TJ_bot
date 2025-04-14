@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -86,6 +87,7 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 		wg.Add(1)
 		go func() {
 			for u := range ch {
+				now := time.Now()
 				_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID:      u.ChatID,
 					Text:        update.Message.ReplyToMessage.Text,
@@ -94,6 +96,7 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 				if err != nil {
 					log.Println("error while sending mailing: " + err.Error())
 				}
+				log.Println(time.Since(now))
 			}
 		}()
 	}
