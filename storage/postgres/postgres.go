@@ -97,7 +97,7 @@ func (s *Storage) GetAllUsersByRegionID(regionID int) ([]types.User, error) {
 func (s *Storage) GetAllUsers() ([]types.User, error) {
 	q := "SELECT * FROM users WHERE is_deleted = false"
 	var users []types.User
-	err := s.db.Select(&users, q, regionID)
+	err := s.db.Select(&users, q)
 	return users, err
 }
 
