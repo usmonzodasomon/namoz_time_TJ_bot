@@ -8,6 +8,7 @@ type Storage interface {
 	AddUserIfNotExist(user types.User) error
 	GetUser(chatID int64) (types.User, error)
 	GetAllUsersByRegionID(regionID int) ([]types.User, error)
+	GetAllUsers() ([]types.User, error)
 	UpdateUser(user types.User) error
 	DeleteUser(chatID int64) error
 	GetNamazTime(date string) (types.NamazTime, error)

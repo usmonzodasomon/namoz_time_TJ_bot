@@ -2,7 +2,9 @@ package telegram
 
 import (
 	"context"
+
 	"github.com/go-telegram/bot"
+
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/handler"
 )
 
@@ -25,6 +27,7 @@ func (b *Bot) Start(ctx context.Context) {
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/region", bot.MatchTypeExact, b.Handler.RegionHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/taqvim", bot.MatchTypeExact, b.Handler.TaqvimHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/mailing_me", bot.MatchTypeExact, b.Handler.MailingMeHandler, b.Handler.AuthHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/mailing_all", bot.MatchTypeExact, b.Handler.MailingAllHandler, b.Handler.AuthHandler)
 
 	b.Bot.RegisterHandlerMatchFunc(isLang, b.Handler.LangHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTime, b.Handler.TimeHandler)

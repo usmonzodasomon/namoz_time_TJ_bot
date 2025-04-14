@@ -94,6 +94,13 @@ func (s *Storage) GetAllUsersByRegionID(regionID int) ([]types.User, error) {
 	return users, err
 }
 
+func (s *Storage) GetAllUsers() ([]types.User, error) {
+	q := "SELECT * FROM users WHERE is_deleted = false"
+	var users []types.User
+	err := s.db.Select(&users, q, regionID)
+	return users, err
+}
+
 func (s *Storage) GetNamazTime(date string) (types.NamazTime, error) {
 	q := "SELECT * FROM namaz_time WHERE date = $1"
 	var namazTime types.NamazTime
