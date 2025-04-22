@@ -87,6 +87,7 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			for u := range ch {
 				now := time.Now()
 				_, err = b.SendMessage(ctx, &bot.SendMessageParams{
@@ -101,7 +102,7 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 			}
 		}()
 	}
-	wg.Done()
+	wg.Wait()
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,

@@ -156,12 +156,13 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			for user := range ch {
 				s.SendMessageForUser(user, namazID, regionID, namazTime)
 			}
 		}()
 	}
-	wg.Done()
+	wg.Wait()
 	return nil
 }
 
