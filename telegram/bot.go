@@ -28,7 +28,7 @@ func (b *Bot) Start(ctx context.Context) {
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/taqvim", bot.MatchTypeExact, b.Handler.TaqvimHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/mailing_me", bot.MatchTypeExact, b.Handler.MailingMeHandler, b.Handler.AuthHandler)
 	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/mailing_all", bot.MatchTypeExact, b.Handler.MailingAllHandler, b.Handler.AuthHandler)
-	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/stat", bot.MatchTypeExact, b.Handler.MailingAllHandler, b.Handler.AuthHandler)
+	b.Bot.RegisterHandler(bot.HandlerTypeMessageText, "/stat", bot.MatchTypeExact, b.Handler.StatHandler, b.Handler.AuthHandler)
 
 	b.Bot.RegisterHandlerMatchFunc(isLang, b.Handler.LangHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTime, b.Handler.TimeHandler)
