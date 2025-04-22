@@ -163,3 +163,9 @@ type Region struct {
 	ID   int    `db:"id"`
 	Name string `db:"region"`
 }
+
+type UserStats struct {
+	TotalUsers    int `db:"total_users"`
+	ActiveUsers   int `db:"active_users"`
+	NewUsersToday int `db:"new_users_today"`
+}

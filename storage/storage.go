@@ -16,4 +16,5 @@ type Storage interface {
 	GetRegionByID(lang string, id int) (types.Region, error)
 	UpdateNamazTime(namazTime []types.NamazTime) error
 	UpdateTaqvimTime(taqvimTime types.TaqvimTime) error
+	GetStat() (types.UserStats, error)
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -107,4 +108,36 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 		Text:        "Рассылка окончена...",
 		ReplyMarkup: inlineButtonMain(user.Language),
 	})
+}
+
+func (h *Handler) StatHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	user, err := h.storage.GetUser(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	stats, err := h.storage.GetStat()
+	if err != nil {
+		log.Println("error getting stat", err)
+		return
+	}
+
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.Message.Chat.ID,
+		Text: fmt.Sprintf(
+			"📊 Статистика пользователей:\n\n"+
+				"👥 Всего пользователей: %d\n"+
+				"✅ Активных: %d\n"+
+				"🆕 Новых за сегодня: %d",
+			stats.TotalUsers,
+			stats.ActiveUsers,
+			stats.NewUsersToday,
+		),
+		ReplyMarkup: inlineButtonMain(user.Language),
+	})
+	if err != nil {
+		fmt.Println("error sending message", err)
+		return
+	}
 }

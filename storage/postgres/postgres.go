@@ -167,3 +167,18 @@ func (s *Storage) UpdateTaqvimTime(taqvimTime types.TaqvimTime) error {
 	}
 	return nil
 }
+
+func (s *Storage) GetStat() (types.UserStats, error) {
+	q := `SELECT
+		COUNT(*) AS total_users,
+		COUNT(*) FILTER (WHERE is_deleted = FALSE) AS active_users,
+		COUNT(*) FILTER (WHERE created_at::date = CURRENT_DATE) AS new_users_today
+			FROM users;
+`
+	var stat types.UserStats
+	err := s.db.Get(&stat, q)
+	if err != nil {
+		return types.UserStats{}, err
+	}
+	return stat, nil
+}
