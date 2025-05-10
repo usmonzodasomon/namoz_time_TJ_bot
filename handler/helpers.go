@@ -75,47 +75,6 @@ func (h *Handler) GetNamazTimeForCurrentRegion(namazTime types.NamazTime, region
 	return namazTime
 }
 
-func (h *Handler) GetTaqvimTimeForCurrentRegion(taqvimTime types.TaqvimTime, regionID int) types.TaqvimTime {
-	q := types.RegionsTime[regionID]
-
-	Fajr, err := time.Parse("15:04", taqvimTime.Fajr)
-	if err != nil {
-		log.Println(err)
-	} else {
-		taqvimTime.Fajr = Fajr.Add(time.Minute * time.Duration(q)).Format("15:04")
-	}
-
-	Zuhr, err := time.Parse("15:04", taqvimTime.Zuhr)
-	if err != nil {
-		log.Println(err)
-	} else {
-		taqvimTime.Zuhr = Zuhr.Add(time.Minute * time.Duration(q)).Format("15:04")
-	}
-
-	Asr, err := time.Parse("15:04", taqvimTime.Asr)
-	if err != nil {
-		log.Println(err)
-	} else {
-		taqvimTime.Asr = Asr.Add(time.Minute * time.Duration(q)).Format("15:04")
-	}
-
-	Maghrib, err := time.Parse("15:04", taqvimTime.Maghrib)
-	if err != nil {
-		log.Println(err)
-	} else {
-		taqvimTime.Maghrib = Maghrib.Add(time.Minute * time.Duration(q)).Format("15:04")
-	}
-
-	Isha, err := time.Parse("15:04", taqvimTime.Isha)
-	if err != nil {
-		log.Println(err)
-	} else {
-		taqvimTime.Isha = Isha.Add(time.Minute * time.Duration(q)).Format("15:04")
-	}
-
-	return taqvimTime
-}
-
 func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
 	kb := &models.ReplyKeyboardMarkup{
 		Keyboard: [][]models.KeyboardButton{
