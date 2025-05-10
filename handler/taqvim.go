@@ -26,6 +26,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 		log.Println(err)
 		return
 	}
+	taqvimTime = h.GetTaqvimTimeForCurrentRegion(taqvimTime, user.RegionID)
 	fmt.Println(taqvimTime)
 
 	namazString := fmt.Sprintf(`
@@ -40,7 +41,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 `,
 		messages.Messages[user.Language]["Today"], date, messages.Messages[user.Language][time.Now().Weekday().String()],
 		messages.Messages[user.Language]["Region"], types.Regions[user.Language][user.RegionID-1],
-		types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr, // Только одно время
+		types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr,
 		types.Stickers[1], types.NamazIndex[user.Language][1], taqvimTime.Zuhr,
 		types.Stickers[2], types.NamazIndex[user.Language][2], taqvimTime.Asr,
 		types.Stickers[3], types.NamazIndex[user.Language][3], taqvimTime.Maghrib,
