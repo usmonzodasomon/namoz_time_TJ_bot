@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	ErrBlockUser      = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: bot was blocked by the user"}`)
-	ErrDeactivateUser = errors.New(`unexpected response statusCode 403 for method sendMessage, {"ok":false,"error_code":403,"description":"Forbidden: user is deactivated"}`)
+	ErrBlockUser      = errors.New(`forbidden, Forbidden: bot was blocked by the user`)
+	ErrDeactivateUser = errors.New(`forbidden, Forbidden: user is deactivated`)
 	ErrChatNotFound   = errors.New(`unexpected response statusCode 400 for method sendMessage, {"ok":false,"error_code":400,"description":"Bad Request: chat not found"}"`)
 )
 
