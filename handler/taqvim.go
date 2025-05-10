@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -23,49 +21,35 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 	}
 
 	date := time.Now().Format("02.01.2006")
-	weekday := messages.Messages[user.Language][time.Now().Weekday().String()]
-	region := types.Regions[user.Language][user.RegionID-1]
-
 	taqvimTime, err := h.storage.GetTaqvimTime()
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	taqvimTime = h.GetTaqvimTimeForCurrentRegion(taqvimTime, user.RegionID)
+	fmt.Println(taqvimTime)
 
-	type Entry struct {
-		Emoji string
-		Name  string
-		Time  string
-	}
-	entries := []Entry{
-		{types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr},
-		{types.Stickers[1], types.NamazIndex[user.Language][1], taqvimTime.Zuhr},
-		{types.Stickers[2], types.NamazIndex[user.Language][2], taqvimTime.Asr},
-		{types.Stickers[3], types.NamazIndex[user.Language][3], taqvimTime.Maghrib},
-		{types.Stickers[4], types.NamazIndex[user.Language][4], taqvimTime.Isha},
-	}
+	namazString := fmt.Sprintf(`
+📆 <b><i>%s: %s, %s</i></b>
+🏢 <b><i>%s:        %s</i></b>
 
-	maxLen := 0
-	for _, e := range entries {
-		l := utf8.RuneCountInString(e.Emoji + " " + e.Name)
-		maxLen = max(maxLen, l)
-	}
-
-	var builder strings.Builder
-	builder.WriteString(fmt.Sprintf("📆 %s: %s, %s\n", messages.Messages[user.Language]["Today"], date, weekday))
-	builder.WriteString(fmt.Sprintf("🏢 %s: %s\n\n", messages.Messages[user.Language]["Region"], region))
-	builder.WriteString("<pre>\n")
-
-	for _, e := range entries {
-		builder.WriteString(fmt.Sprintf("%-8s %-7s: %s\n", e.Emoji, e.Name, e.Time))
-	}
-
-	builder.WriteString("</pre>")
-
+<b><i>%s %s:</i></b>          <code>%s</code>
+<b><i>%s %s:</i></b>              <code>%s</code>
+<b><i>%s %s:</i></b>                  <code>%s</code>
+<b><i>%s %s:</i></b>              <code>%s</code>
+<b><i>%s %s:</i></b>          <code>%s</code>
+`,
+		messages.Messages[user.Language]["Today"], date, messages.Messages[user.Language][time.Now().Weekday().String()],
+		messages.Messages[user.Language]["Region"], types.Regions[user.Language][user.RegionID-1],
+		types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr,
+		types.Stickers[1], types.NamazIndex[user.Language][1], taqvimTime.Zuhr,
+		types.Stickers[2], types.NamazIndex[user.Language][2], taqvimTime.Asr,
+		types.Stickers[3], types.NamazIndex[user.Language][3], taqvimTime.Maghrib,
+		types.Stickers[4], types.NamazIndex[user.Language][4], taqvimTime.Isha,
+	)
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
-		Text:        builder.String(),
+		Text:        namazString,
 		ParseMode:   models.ParseModeHTML,
 		ReplyMarkup: inlineButtonMain(user.Language),
 	})
