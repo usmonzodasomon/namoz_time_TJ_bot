@@ -53,14 +53,15 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 	}
 
 	var builder strings.Builder
-	builder.WriteString(fmt.Sprintf("📆 <b><i>%s: %s, %s</i></b>\n", messages.Messages[user.Language]["Today"], date, weekday))
-	builder.WriteString(fmt.Sprintf("🏢 <b><i>%s: %s</i></b>\n\n", messages.Messages[user.Language]["Region"], region))
+	builder.WriteString(fmt.Sprintf("📆 %s: %s, %s\n", messages.Messages[user.Language]["Today"], date, weekday))
+	builder.WriteString(fmt.Sprintf("🏢 %s: %s\n\n", messages.Messages[user.Language]["Region"], region))
+	builder.WriteString("<pre>\n")
 
 	for _, e := range entries {
-		title := fmt.Sprintf("%s %s", e.Emoji, e.Name)
-		padded := fmt.Sprintf("%-*s", maxLen, title)
-		builder.WriteString(fmt.Sprintf("<b><i>%s:</i></b> <code>%s</code>\n", padded, e.Time))
+		builder.WriteString(fmt.Sprintf("%-8s %-7s: %s\n", e.Emoji, e.Name, e.Time))
 	}
+
+	builder.WriteString("</pre>")
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
