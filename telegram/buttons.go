@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"github.com/go-telegram/bot/models"
+
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
 )
 
@@ -19,4 +20,8 @@ func isLangButton(update *models.Update) bool {
 
 func isRegionButton(update *models.Update) bool {
 	return update.Message != nil && (update.Message.Text == "🏙 "+messages.Messages["ru"]["ChooseRegionBtn"] || update.Message.Text == "🏙 "+messages.Messages["tj"]["ChooseRegionBtn"])
+}
+
+func isTaqvimButton(update *models.Update) bool {
+	return update.Message != nil && (update.Message.Text == "🕌 "+messages.Messages["ru"]["Taqvim"] || "🕌 "+update.Message.Text == messages.Messages["tj"]["Taqvim"])
 }

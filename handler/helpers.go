@@ -80,9 +80,13 @@ func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
 		Keyboard: [][]models.KeyboardButton{
 			{
 				{Text: "🕓 " + messages.Messages[lang]["NamazTimeBtn"]},
-			}, {
+			},
+			{
 				{Text: "🇹🇯 " + messages.Messages[lang]["ChooseLanguageBtn"]},
 				{Text: "🏙 " + messages.Messages[lang]["ChooseRegionBtn"]},
+			},
+			{
+				{Text: "🕌 " + messages.Messages[lang]["Taqvim"]},
 			},
 		},
 		ResizeKeyboard: true,

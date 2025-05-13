@@ -10,7 +10,7 @@ var TJ = map[string]string{
 	"NextNamaz":         "Намози оянда",
 	"Time":              "Вақт",
 	"YourChoose":        "Шумо интихоб кардед",
-	"NamazTimeBtn":      "Вақти намоз",
+	"NamazTimeBtn":      "Вақти намоз shuroiulamo.tj",
 	"ChooseLanguageBtn": "Интихоби забон",
 	"ChooseRegionBtn":   "Интихоби шаҳр",
 	"ChooseLanguage":    "Забонро интихоб кунед",
@@ -23,6 +23,6 @@ var TJ = map[string]string{
 	"Sunday":            "Якшанбе",
 	"Suhur":             "Нияти субҳгоҳии рӯза",
 	"Iftar":             "Нияти шомгоҳии рӯза",
-	"Taqvim":            "Тақвими моҳи шарифи Рамазон",
+	"Taqvim":            "Вақти намоз taqvim.tj",
 	"Region":            "Шаҳр",
 }

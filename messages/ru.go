@@ -10,7 +10,7 @@ var RU = map[string]string{
 	"NextNamaz":         "Следующий намаз",
 	"Time":              "Время",
 	"YourChoose":        "Вы выбрали",
-	"NamazTimeBtn":      "Время намаза",
+	"NamazTimeBtn":      "Время намаза shuroiulamo.tj",
 	"ChooseLanguageBtn": "Выбрать язык",
 	"ChooseRegionBtn":   "Выбрать город",
 	"ChooseLanguage":    "Выберите язык",
@@ -23,6 +23,6 @@ var RU = map[string]string{
 	"Sunday":            "Воскресенье",
 	"Suhur":             "Дуа для сухура",
 	"Iftar":             "Дуа для ифтара",
-	"Taqvim":            "Календарь Священного месяца Рамадан",
+	"Taqvim":            "Время намаза taqvim.tj",
 	"Region":            "Город",
 }
