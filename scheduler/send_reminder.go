@@ -22,34 +22,32 @@ var (
 )
 
 func (s *Scheduler) SendReminders() {
-	date := time.Now().Format("02.01.2006")
-	namazTime, err := s.storage.GetNamazTime(date)
+	taqvimTime, err := s.storage.GetTaqvimTime()
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 
 	for namazID := 0; namazID < 5; namazID++ {
-		s.SendRemindersForNamaz(namazID, namazTime)
+		s.SendRemindersForNamaz(namazID, taqvimTime)
 	}
 }
 
-func (s *Scheduler) SendRemindersForNamaz(namazID int, namazTime types.NamazTime) {
+func (s *Scheduler) SendRemindersForNamaz(namazID int, taqvimTime types.TaqvimTime) {
 	for regionID := 1; regionID <= 14; regionID++ {
-		s.SendRemindersForRegion(namazID, regionID, namazTime)
+		s.SendRemindersForRegion(namazID, regionID, taqvimTime)
 	}
-
 }
 
-func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, namazTime types.NamazTime) {
-	namazTime = s.telegram.Handler.GetNamazTimeForCurrentRegion(namazTime, regionID)
-
+func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, taqvimTime types.TaqvimTime) {
 	nowInMinutes := getMinutes(time.Now())
-	nmzTimeForCurrRegion := getMinutes(getNamazTimeWithNamazID(namazTime, namazID).From.
-		Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+
+	taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+	taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
+	nmzTimeForCurrRegion := getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
 
 	if isNamazTime(nmzTimeForCurrRegion, nowInMinutes) && !types.SendNotifications[regionID][namazID] {
-		if err := s.SendMessageForAllUsers(namazID, regionID, namazTime); err != nil {
+		if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime); err != nil {
 			log.Println("error sending notification:", err)
 		}
 		types.SendNotifications[regionID] = make(map[int]bool)
@@ -57,75 +55,20 @@ func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, namazTime type
 	}
 }
 
-func getNamazTimeWithNamazID(namazTime types.NamazTime, namazID int) types.NamazTimeStruct {
+func getTaqvimTimeWithNamazID(taqvimTime types.TaqvimTime, namazID int) string {
 	switch namazID {
 	case 0:
-		FajrFrom, err := time.Parse("15:04", namazTime.FajrFrom)
-		if err != nil {
-			log.Println(err)
-		}
-		FajrTo, err := time.Parse("15:04", namazTime.FajrTo)
-		if err != nil {
-			log.Println(err)
-		}
-		return types.NamazTimeStruct{
-			From: FajrFrom,
-			To:   FajrTo,
-		}
+		return taqvimTime.Fajr
 	case 1:
-		ZuhrFrom, err := time.Parse("15:04", namazTime.ZuhrFrom)
-		if err != nil {
-			log.Println(err)
-		}
-		ZuhrTo, err := time.Parse("15:04", namazTime.ZuhrTo)
-		if err != nil {
-			log.Println(err)
-		}
-		return types.NamazTimeStruct{
-			From: ZuhrFrom,
-			To:   ZuhrTo,
-		}
+		return taqvimTime.Zuhr
 	case 2:
-		AsrFrom, err := time.Parse("15:04", namazTime.AsrFrom)
-		if err != nil {
-			log.Println(err)
-		}
-		AsrTo, err := time.Parse("15:04", namazTime.AsrTo)
-		if err != nil {
-			log.Println(err)
-		}
-		return types.NamazTimeStruct{
-			From: AsrFrom,
-			To:   AsrTo,
-		}
+		return taqvimTime.Asr
 	case 3:
-		MaghribFrom, err := time.Parse("15:04", namazTime.MaghribFrom)
-		if err != nil {
-			log.Println(err)
-		}
-		MaghribTo, err := time.Parse("15:04", namazTime.MaghribTo)
-		if err != nil {
-			log.Println(err)
-		}
-		return types.NamazTimeStruct{
-			From: MaghribFrom,
-			To:   MaghribTo,
-		}
+		return taqvimTime.Maghrib
 	case 4:
-		IshaFrom, err := time.Parse("15:04", namazTime.IshaFrom)
-		if err != nil {
-			log.Println(err)
-		}
-		IshaTo, err := time.Parse("15:04", namazTime.IshaTo)
-		if err != nil {
-			log.Println(err)
-		}
-		return types.NamazTimeStruct{
-			From: IshaFrom,
-			To:   IshaTo,
-		}
+		return taqvimTime.Isha
 	}
-	return types.NamazTimeStruct{}
+	return ""
 }
 
 func isNamazTime(namazTimeForCurrentRegionInMinutes, nowInMinutes int) bool {
@@ -137,13 +80,12 @@ func getMinutes(t time.Time) int {
 	return t.Hour()*60 + t.Minute()
 }
 
-func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime types.NamazTime) error {
+func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime types.TaqvimTime) error {
 	users, err := s.storage.GetAllUsersByRegionID(regionID)
 	if err != nil {
 		return err
 	}
 
-	//* Testing some hypothesis
 	ch := make(chan types.User)
 	wg := &sync.WaitGroup{}
 	go func(ch chan types.User) {
@@ -158,7 +100,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 		go func() {
 			defer wg.Done()
 			for user := range ch {
-				s.SendMessageForUser(user, namazID, regionID, namazTime)
+				s.SendMessageForUser(user, namazID, regionID, taqvimTime)
 			}
 		}()
 	}
@@ -166,7 +108,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, namazTime type
 	return nil
 }
 
-func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, namazTime types.NamazTime) {
+func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime) {
 	if err := s.DeleteMessage(user.ChatID, user.LastMessageID); err != nil {
 		log.Println("Error deleting message: ", err)
 	}
@@ -181,7 +123,7 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 		})
 	}
 
-	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, namazTime))
+	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, taqvimTime))
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
 		if err.Error() == ErrBlockUser.Error() ||
@@ -203,19 +145,18 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, n
 	}
 }
 
-func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, namazTime types.NamazTime) *bot.SendMessageParams {
+func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime) *bot.SendMessageParams {
+	timeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+	adjustedTime, _ := time.Parse("15:04", timeStr)
+	adjustedTime = adjustedTime.Add(time.Minute * time.Duration(types.RegionsTime[regionID]))
+
 	msg := fmt.Sprintf(
 		`<b>%s:</b> %s
-<b>%s:</b> %s %s %s %s`,
+<b>%s:</b> %s`,
 		messages.Messages[user.Language]["NextNamaz"],
 		types.NamazIndex[user.Language][namazID],
 		messages.Messages[user.Language]["Time"],
-		messages.Messages[user.Language]["IntervalFrom"],
-		getNamazTimeWithNamazID(namazTime, namazID).From.
-			Format("15:04"), // находим время намаза для региона
-		messages.Messages[user.Language]["IntervalTo"],
-		getNamazTimeWithNamazID(namazTime, namazID).To.
-			Format("15:04")) // находим время истечения намаза для региона
+		adjustedTime.Format("15:04"))
 
 	return &bot.SendMessageParams{
 		ChatID:    user.ChatID,
