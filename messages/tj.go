@@ -25,4 +25,5 @@ var TJ = map[string]string{
 	"Iftar":             "Нияти шомгоҳии рӯза",
 	"Taqvim":            "Вақти намоз taqvim.tj",
 	"Region":            "Шаҳр",
+	"Source":            "Манбаъ",
 }

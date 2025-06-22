@@ -32,7 +32,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
 🏢 <b><i>%s:        %s</i></b>
-📰 <b><i>Манбаъ: taqvim.tj</i></b>
+📰 <b><i>%s: taqvim.tj</i></b>
 
 <b><i>%s %s:</i></b>          <code>%s</code>
 <b><i>%s %s:</i></b>              <code>%s</code>
@@ -42,6 +42,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 `,
 		messages.Messages[user.Language]["Today"], date, messages.Messages[user.Language][time.Now().Weekday().String()],
 		messages.Messages[user.Language]["Region"], types.Regions[user.Language][user.RegionID-1],
+		messages.Messages[user.Language]["Source"],
 		types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr,
 		types.Stickers[1], types.NamazIndex[user.Language][1], taqvimTime.Zuhr,
 		types.Stickers[2], types.NamazIndex[user.Language][2], taqvimTime.Asr,

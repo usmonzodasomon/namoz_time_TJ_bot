@@ -25,4 +25,5 @@ var RU = map[string]string{
 	"Iftar":             "Дуа для ифтара",
 	"Taqvim":            "Время намаза taqvim.tj",
 	"Region":            "Город",
+	"Source":            "Источник",
 }
