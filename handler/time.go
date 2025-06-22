@@ -30,6 +30,7 @@ func (h *Handler) TimeHandler(ctx context.Context, b *bot.Bot, update *models.Up
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
 🏢 <b><i>%s:        %s</i></b>
+📰 <b><i>Манбаъ: shuroiulamo.tj</i></b>
 
 <b><i>%s %s:</i></b>          <code>%s - %s</code>
 <b><i>%s %s:</i></b>              <code>%s - %s</code>

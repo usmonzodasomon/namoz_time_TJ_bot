@@ -32,6 +32,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
 🏢 <b><i>%s:        %s</i></b>
+📰 <b><i>Манбаъ: taqvim.tj</i></b>
 
 <b><i>%s %s:</i></b>          <code>%s</code>
 <b><i>%s %s:</i></b>              <code>%s</code>
