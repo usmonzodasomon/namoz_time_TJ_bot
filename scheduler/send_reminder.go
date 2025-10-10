@@ -114,7 +114,7 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, t
 	}
 
 	if namazID == 0 {
-		s.telegram.Handler.TimeHandler(context.Background(), s.telegram.Bot, &models.Update{
+		s.telegram.Handler.TaqvimHandler(context.Background(), s.telegram.Bot, &models.Update{
 			Message: &models.Message{
 				Chat: models.Chat{
 					ID: user.ChatID,
