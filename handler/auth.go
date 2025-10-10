@@ -10,7 +10,7 @@ import (
 
 func (h *Handler) AuthHandler(next bot.HandlerFunc) bot.HandlerFunc {
 	return func(ctx context.Context, bot *bot.Bot, update *models.Update) {
-		if update.Message.Chat.ID != 7691545395 {
+		if update.Message.Chat.ID != h.adminChatID {
 			log.Println("unauthorized client")
 			return
 		}

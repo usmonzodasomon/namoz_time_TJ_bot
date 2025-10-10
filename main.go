@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 )
 
 func main() {
@@ -34,20 +35,27 @@ func main() {
 		return
 	}
 
-	dbConn, err := database.GetDBConnection(database.Config{
+	dbConfig := database.Config{
 		User:     os.Getenv("DB_USER"),
 		DBName:   os.Getenv("DB_NAME"),
 		SSLMode:  os.Getenv("DB_SSLMODE"),
 		Password: os.Getenv("DB_PASSWORD"),
 		Host:     os.Getenv("DB_HOST"),
-	})
+	}
+	dbConn, err := database.GetDBConnection(dbConfig)
 	if err != nil {
 		log.Println(fmt.Errorf("error connecting to db: %w", err))
 		return
 	}
 
 	storage := postgres.NewPostgresStorage(dbConn)
-	handler := handler.NewHandler(storage)
+	var adminChatID int64
+	if adminIDStr := os.Getenv("ADMIN_CHAT_ID"); adminIDStr != "" {
+		if id, err := strconv.ParseInt(adminIDStr, 10, 64); err == nil {
+			adminChatID = id
+		}
+	}
+	handler := handler.NewHandler(storage, adminChatID)
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 	opts := []bot.Option{
@@ -63,7 +71,7 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	scheduler := scheduler.NewScheduler(sh, storage, tl)
+	scheduler := scheduler.NewScheduler(sh, storage, tl, adminChatID, dbConfig.Host, dbConfig.User, dbConfig.DBName, dbConfig.Password)
 	app := app.NewApp(tl, scheduler)
 	go app.Start(ctx)
 	<-ctx.Done()
