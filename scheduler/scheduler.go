@@ -9,16 +9,26 @@ import (
 )
 
 type Scheduler struct {
-	sh       gocron.Scheduler
-	storage  storage.Storage
-	telegram *telegram.Bot
+	sh          gocron.Scheduler
+	storage     storage.Storage
+	telegram    *telegram.Bot
+	adminChatID int64
+	dbHost      string
+	dbUser      string
+	dbName      string
+	dbPassword  string
 }
 
-func NewScheduler(scheduler gocron.Scheduler, storage storage.Storage, telegram *telegram.Bot) *Scheduler {
+func NewScheduler(scheduler gocron.Scheduler, storage storage.Storage, telegram *telegram.Bot, adminChatID int64, dbHost, dbUser, dbName, dbPassword string) *Scheduler {
 	return &Scheduler{
-		sh:       scheduler,
-		storage:  storage,
-		telegram: telegram,
+		sh:          scheduler,
+		storage:     storage,
+		telegram:    telegram,
+		adminChatID: adminChatID,
+		dbHost:      dbHost,
+		dbUser:      dbUser,
+		dbName:      dbName,
+		dbPassword:  dbPassword,
 	}
 }
 
@@ -38,6 +48,12 @@ func (s *Scheduler) Start() {
 	}
 
 	_, err = s.sh.NewJob(gocron.CronJob("5 0 * * *", false), gocron.NewTask(s.UpdateTaqvimTime))
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Database backup job - runs daily at 03:00
+	_, err = s.sh.NewJob(gocron.CronJob("0 3 * * *", false), gocron.NewTask(s.SendDatabaseBackup))
 	if err != nil {
 		log.Println(err)
 	}

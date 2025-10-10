@@ -5,11 +5,13 @@ import (
 )
 
 type Handler struct {
-	storage storage.Storage
+	storage     storage.Storage
+	adminChatID int64
 }
 
-func NewHandler(storage storage.Storage) *Handler {
+func NewHandler(storage storage.Storage, adminChatID int64) *Handler {
 	return &Handler{
-		storage: storage,
+		storage:     storage,
+		adminChatID: adminChatID,
 	}
 }
