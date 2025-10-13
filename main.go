@@ -72,6 +72,7 @@ func main() {
 		log.Println(err)
 	}
 	scheduler := scheduler.NewScheduler(sh, storage, tl, adminChatID, dbConfig.Host, dbConfig.User, dbConfig.DBName, dbConfig.Password)
+	handler.SetScheduler(scheduler)
 	app := app.NewApp(tl, scheduler)
 	go app.Start(ctx)
 	<-ctx.Done()
