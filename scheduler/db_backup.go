@@ -39,14 +39,13 @@ func (s *Scheduler) SendDatabaseBackup() {
 
 	log.Printf("Database backup sent successfully: %s (%.2f MB)", backupFilePath, float64(fileInfo.Size())/1024/1024)
 }
-
 func (s *Scheduler) createDatabaseBackup() (string, error) {
 	timestamp := time.Now().Format("2006-01-02")
 	backupFileName := fmt.Sprintf("namoz_bot_backup_%s.sql.gz", timestamp)
 	backupFilePath := fmt.Sprintf("/tmp/%s", backupFileName)
 
 	cmd := exec.Command("bash", "-c",
-		fmt.Sprintf("pg_dump -h %s -U %s -d %s | gzip > %s",
+		fmt.Sprintf("set -o pipefail; pg_dump -h %s -U %s -d %s | gzip > %s",
 			s.dbHost,
 			s.dbUser,
 			s.dbName,
