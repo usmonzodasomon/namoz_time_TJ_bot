@@ -22,6 +22,8 @@ RUN apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
+    postgresql-client \
+    gzip \
     && update-ca-certificates
 
 RUN chmod +x ./main

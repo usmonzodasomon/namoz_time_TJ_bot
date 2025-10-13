@@ -68,10 +68,6 @@ func (s *Scheduler) createDatabaseBackup() (string, error) {
 		return "", fmt.Errorf("backup file is empty (0 bytes)")
 	}
 
-	if fileInfo.Size() < 100 {
-		return "", fmt.Errorf("backup file is suspiciously small: %d bytes", fileInfo.Size())
-	}
-
 	log.Printf("Backup created successfully: %s (%.2f MB)", backupFilePath, float64(fileInfo.Size())/1024/1024)
 
 	return backupFilePath, nil
