@@ -45,20 +45,35 @@ func (s *Scheduler) createDatabaseBackup() (string, error) {
 	backupFileName := fmt.Sprintf("namoz_bot_backup_%s.sql.gz", timestamp)
 	backupFilePath := fmt.Sprintf("/tmp/%s", backupFileName)
 
-	// Create pg_dump command with gzip compression
-	cmd := exec.Command("sh", "-c",
-		fmt.Sprintf("PGPASSWORD='%s' pg_dump -h %s -U %s -d %s | gzip > %s",
-			s.dbPassword,
+	cmd := exec.Command("bash", "-c",
+		fmt.Sprintf("pg_dump -h %s -U %s -d %s | gzip > %s",
 			s.dbHost,
 			s.dbUser,
 			s.dbName,
 			backupFilePath,
 		))
 
+	cmd.Env = append(os.Environ(), fmt.Sprintf("PGPASSWORD=%s", s.dbPassword))
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to create backup: %v, output: %s", err, string(output))
 	}
+
+	fileInfo, err := os.Stat(backupFilePath)
+	if err != nil {
+		return "", fmt.Errorf("backup file was not created: %v", err)
+	}
+
+	if fileInfo.Size() == 0 {
+		return "", fmt.Errorf("backup file is empty (0 bytes)")
+	}
+
+	if fileInfo.Size() < 100 {
+		return "", fmt.Errorf("backup file is suspiciously small: %d bytes", fileInfo.Size())
+	}
+
+	log.Printf("Backup created successfully: %s (%.2f MB)", backupFilePath, float64(fileInfo.Size())/1024/1024)
 
 	return backupFilePath, nil
 }
