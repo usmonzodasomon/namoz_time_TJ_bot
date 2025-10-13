@@ -44,8 +44,8 @@ func (s *Scheduler) createDatabaseBackup() (string, error) {
 	backupFileName := fmt.Sprintf("namoz_bot_backup_%s.sql.gz", timestamp)
 	backupFilePath := fmt.Sprintf("/tmp/%s", backupFileName)
 
-	cmd := exec.Command("bash", "-c",
-		fmt.Sprintf("set -o pipefail; pg_dump -h %s -U %s -d %s | gzip > %s",
+	cmd := exec.Command("sh", "-c",
+		fmt.Sprintf("pg_dump -h %s -U %s -d %s | gzip > %s",
 			s.dbHost,
 			s.dbUser,
 			s.dbName,
