@@ -22,8 +22,8 @@ RUN apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    postgresql-client \
     gzip \
+    && apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main postgresql-client \
     && update-ca-certificates
 
 RUN chmod +x ./main
