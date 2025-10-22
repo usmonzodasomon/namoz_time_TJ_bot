@@ -26,4 +26,7 @@ var TJ = map[string]string{
 	"Taqvim":            "Вақти намоз taqvim.tj",
 	"Region":            "Шаҳр",
 	"Source":            "Манбаъ",
+	"Settings":          "Танзимот",
+	"SettingsBtn":       "Танзимот",
+	"Language":          "Забон",
 }

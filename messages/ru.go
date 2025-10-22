@@ -26,4 +26,7 @@ var RU = map[string]string{
 	"Taqvim":            "Время намаза taqvim.tj",
 	"Region":            "Город",
 	"Source":            "Источник",
+	"Settings":          "Настройки",
+	"SettingsBtn":       "Настройки",
+	"Language":          "Язык",
 }

@@ -82,10 +82,7 @@ func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
 				{Text: "🕓 " + messages.Messages[lang]["NamazTimeBtn"]},
 			},
 			{
-				{Text: "🇹🇯 " + messages.Messages[lang]["ChooseLanguageBtn"]},
-				{Text: "🏙 " + messages.Messages[lang]["ChooseRegionBtn"]},
-			},
-			{
+				{Text: "⚙️ " + messages.Messages[lang]["SettingsBtn"]},
 				{Text: "🕌 " + messages.Messages[lang]["Taqvim"]},
 			},
 		},
