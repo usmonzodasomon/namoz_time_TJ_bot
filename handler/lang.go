@@ -59,7 +59,8 @@ func (h *Handler) onInlineKeyboardSelectLanguage(ctx context.Context, b *bot.Bot
 	}
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: mes.Message.Chat.ID,
-		Text:   messages.Messages[lang]["YourChoose"] + ": " + langDisplay,
+		ChatID:      mes.Message.Chat.ID,
+		Text:        messages.Messages[lang]["YourChoose"] + ": " + langDisplay,
+		ReplyMarkup: inlineButtonMain(lang),
 	})
 }
