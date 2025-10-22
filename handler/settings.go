@@ -18,8 +18,8 @@ func (h *Handler) SettingsHandler(ctx context.Context, b *bot.Bot, update *model
 	}
 
 	kb := inline.New(b).Row().
-		Button(messages.Messages[user.Language]["Language"], []byte("settings_language"), h.onInlineKeyboardSettingsLanguage).
-		Button(messages.Messages[user.Language]["Region"], []byte("settings_region"), h.onInlineKeyboardSettingsRegion)
+		Button("🇹🇯 "+messages.Messages[user.Language]["Language"], []byte("settings_language"), h.onInlineKeyboardSettingsLanguage).
+		Button("🏙 "+messages.Messages[user.Language]["Region"], []byte("settings_region"), h.onInlineKeyboardSettingsRegion)
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
@@ -76,7 +76,7 @@ func (h *Handler) onInlineKeyboardSettingsRegion(ctx context.Context, b *bot.Bot
 
 	kb := inline.New(b).Row()
 	for i, region := range types.Regions[user.Language] {
-		kb = kb.Button(region, []byte(region), h.onInlineKeyboardSelectRegion)
+		kb = kb.Button("📍 "+region, []byte(region), h.onInlineKeyboardSelectRegion)
 		if i%2 == 1 {
 			kb = kb.Row()
 		}

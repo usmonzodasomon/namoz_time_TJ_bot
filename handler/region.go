@@ -20,7 +20,7 @@ func (h *Handler) RegionHandler(ctx context.Context, b *bot.Bot, update *models.
 
 	kb := inline.New(b).Row()
 	for i, region := range types.Regions[user.Language] {
-		kb = kb.Button(region, []byte(region), h.onInlineKeyboardSelectRegion)
+		kb = kb.Button("📍 "+region, []byte(region), h.onInlineKeyboardSelectRegion)
 		if i%2 == 1 {
 			kb = kb.Row()
 		}
