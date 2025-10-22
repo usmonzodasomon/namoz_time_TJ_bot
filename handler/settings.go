@@ -44,21 +44,14 @@ func (h *Handler) onInlineKeyboardSettingsLanguage(ctx context.Context, b *bot.B
 		return
 	}
 
-	kb := &models.ReplyKeyboardMarkup{
-		Keyboard: [][]models.KeyboardButton{
-			{
-				{Text: "🇹🇯 Тоҷикӣ"},
-				{Text: "🇷🇺 Русский"},
-			},
-		},
-		ResizeKeyboard: true,
-		Selective:      true,
-	}
+	kb := inline.New(b).Row().
+		Button("🇹🇯 Тоҷикӣ", []byte("lang_tj"), h.onInlineKeyboardSelectLanguage).
+		Button("🇷🇺 Русский", []byte("lang_ru"), h.onInlineKeyboardSelectLanguage)
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      mes.Message.Chat.ID,
 		Text:        messages.Messages[user.Language]["ChooseLanguage"] + ":",
-		ReplyMarkup: kb,
+		ReplyMarkup: &kb,
 	})
 }
 
@@ -76,7 +69,7 @@ func (h *Handler) onInlineKeyboardSettingsRegion(ctx context.Context, b *bot.Bot
 
 	kb := inline.New(b).Row()
 	for i, region := range types.Regions[user.Language] {
-		kb = kb.Button("📍 "+region, []byte(region), h.onInlineKeyboardSelectRegion)
+		kb = kb.Button(region, []byte(region), h.onInlineKeyboardSelectRegion)
 		if i%2 == 1 {
 			kb = kb.Row()
 		}

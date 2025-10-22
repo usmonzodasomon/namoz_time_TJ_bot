@@ -34,7 +34,6 @@ func (b *Bot) Start(ctx context.Context) {
 
 	b.Bot.RegisterHandlerMatchFunc(isLang, b.Handler.LangHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTime, b.Handler.TimeHandler)
-	b.Bot.RegisterHandlerMatchFunc(isLangButton, b.Handler.ChangeLanguage)
 	b.Bot.RegisterHandlerMatchFunc(isRegionButton, b.Handler.RegionHandler)
 	b.Bot.RegisterHandlerMatchFunc(isSettingsButton, b.Handler.SettingsHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTaqvimButton, b.Handler.TaqvimHandler)
