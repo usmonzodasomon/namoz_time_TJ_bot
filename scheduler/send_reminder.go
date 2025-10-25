@@ -45,13 +45,39 @@ func (s *Scheduler) SendRemindersForNamaz(namazID int, taqvimTime types.TaqvimTi
 }
 
 func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) {
+	if types.SendNotifications[regionID][namazID] {
+		return
+	}
+
 	nowInMinutes := getMinutes(time.Now())
 
-	taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
-	taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
-	nmzTimeForCurrRegion := getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+	users, err := s.storage.GetAllUsersByRegionID(regionID)
+	if err != nil {
+		log.Println("error getting users:", err)
+		return
+	}
 
-	if isNamazTime(nmzTimeForCurrRegion, nowInMinutes) && !types.SendNotifications[regionID][namazID] {
+	shouldSend := false
+	for _, user := range users {
+		var userNamazTimeInMinutes int
+
+		if user.PrayerTimeSource == "shuro" && namazTime.Date != "" {
+			shuroTimeStr := getShuroTimeWithNamazID(namazTime, namazID)
+			shuroTimeObj, _ := time.Parse("15:04", shuroTimeStr)
+			userNamazTimeInMinutes = getMinutes(shuroTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+		} else {
+			taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+			taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
+			userNamazTimeInMinutes = getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+		}
+
+		if isNamazTime(userNamazTimeInMinutes, nowInMinutes) {
+			shouldSend = true
+			break
+		}
+	}
+
+	if shouldSend {
 		if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime, namazTime); err != nil {
 			log.Println("error sending notification:", err)
 		}
