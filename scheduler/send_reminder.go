@@ -28,7 +28,7 @@ func (s *Scheduler) SendReminders() {
 		return
 	}
 
-	namazTime, err := s.storage.GetNamazTime(time.Now().Format("2006-01-02"))
+	namazTime, err := s.storage.GetNamazTime(time.Now().Format("02.01.2006"))
 	if err != nil {
 		log.Println("warning: could not get namaz time:", err.Error())
 	}
