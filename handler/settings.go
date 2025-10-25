@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"log"
+
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/go-telegram/ui/keyboard/inline"
+
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/messages"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
-	"log"
 )
 
 func (h *Handler) SettingsHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -23,7 +25,7 @@ func (h *Handler) SettingsHandler(ctx context.Context, b *bot.Bot, update *model
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
-		Text:        messages.Messages[user.Language]["Settings"] + ":",
+		Text:        messages.Messages[user.Language]["Settings"] + ":ᅠᅠᅠᅠ",
 		ReplyMarkup: &kb,
 	})
 	if err != nil {
