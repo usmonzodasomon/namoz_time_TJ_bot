@@ -29,4 +29,8 @@ var TJ = map[string]string{
 	"Settings":          "Танзимот",
 	"SettingsBtn":       "Танзимот",
 	"Language":          "Забон",
+	"ChooseSource":      "Манбаъи вақти намозро интихоб кунед",
+	"TaqvimSource":      "📅 Taqvim.tj",
+	"ShuroSource":       "📋 Shuroiulamo.tj",
+	"SourceSelected":    "Манбаъ иваз шуд ба",
 }
