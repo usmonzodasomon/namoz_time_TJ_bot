@@ -23,8 +23,8 @@ func (s *Storage) AddUserIfNotExist(user types.User) error {
 	err := s.db.Get(&isDeleted, q, user.ChatID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			q = `INSERT INTO users(chat_id, region_id, username, lang) VALUES($1, $2, $3, $4)`
-			_, err = s.db.Exec(q, user.ChatID, user.RegionID, user.Username, user.Language)
+			q = `INSERT INTO users(chat_id, region_id, username, lang, prayer_time_source) VALUES($1, $2, $3, $4, $5)`
+			_, err = s.db.Exec(q, user.ChatID, user.RegionID, user.Username, user.Language, "taqvim")
 			if err != nil {
 				return err
 			}
@@ -70,6 +70,12 @@ func (s *Storage) UpdateUser(user types.User) error {
 	if user.LastMessageID != 0 {
 		queries = append(queries, fmt.Sprintf(" last_message_id = $%d", placeHolderCount))
 		params = append(params, user.LastMessageID)
+		placeHolderCount++
+	}
+
+	if user.PrayerTimeSource != "" {
+		queries = append(queries, fmt.Sprintf(" prayer_time_source = $%d", placeHolderCount))
+		params = append(params, user.PrayerTimeSource)
 		placeHolderCount++
 	}
 

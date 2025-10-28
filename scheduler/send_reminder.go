@@ -28,26 +28,57 @@ func (s *Scheduler) SendReminders() {
 		return
 	}
 
+	namazTime, err := s.storage.GetNamazTime(time.Now().Format("02.01.2006"))
+	if err != nil {
+		log.Println("warning: could not get namaz time:", err.Error())
+	}
+
 	for namazID := 0; namazID < 5; namazID++ {
-		s.SendRemindersForNamaz(namazID, taqvimTime)
+		s.SendRemindersForNamaz(namazID, taqvimTime, namazTime)
 	}
 }
 
-func (s *Scheduler) SendRemindersForNamaz(namazID int, taqvimTime types.TaqvimTime) {
+func (s *Scheduler) SendRemindersForNamaz(namazID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) {
 	for regionID := 1; regionID <= 14; regionID++ {
-		s.SendRemindersForRegion(namazID, regionID, taqvimTime)
+		s.SendRemindersForRegion(namazID, regionID, taqvimTime, namazTime)
 	}
 }
 
-func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, taqvimTime types.TaqvimTime) {
+func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) {
+	if types.SendNotifications[regionID][namazID] {
+		return
+	}
+
 	nowInMinutes := getMinutes(time.Now())
 
-	taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
-	taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
-	nmzTimeForCurrRegion := getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+	users, err := s.storage.GetAllUsersByRegionID(regionID)
+	if err != nil {
+		log.Println("error getting users:", err)
+		return
+	}
 
-	if isNamazTime(nmzTimeForCurrRegion, nowInMinutes) && !types.SendNotifications[regionID][namazID] {
-		if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime); err != nil {
+	shouldSend := false
+	for _, user := range users {
+		var userNamazTimeInMinutes int
+
+		if user.PrayerTimeSource == "shuro" && namazTime.Date != "" {
+			shuroTimeStr := getShuroTimeWithNamazID(namazTime, namazID)
+			shuroTimeObj, _ := time.Parse("15:04", shuroTimeStr)
+			userNamazTimeInMinutes = getMinutes(shuroTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+		} else {
+			taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+			taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
+			userNamazTimeInMinutes = getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+		}
+
+		if isNamazTime(userNamazTimeInMinutes, nowInMinutes) {
+			shouldSend = true
+			break
+		}
+	}
+
+	if shouldSend {
+		if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime, namazTime); err != nil {
 			log.Println("error sending notification:", err)
 		}
 		types.SendNotifications[regionID] = make(map[int]bool)
@@ -80,7 +111,7 @@ func getMinutes(t time.Time) int {
 	return t.Hour()*60 + t.Minute()
 }
 
-func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime types.TaqvimTime) error {
+func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) error {
 	users, err := s.storage.GetAllUsersByRegionID(regionID)
 	if err != nil {
 		return err
@@ -100,7 +131,7 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime typ
 		go func() {
 			defer wg.Done()
 			for user := range ch {
-				s.SendMessageForUser(user, namazID, regionID, taqvimTime)
+				s.SendMessageForUser(user, namazID, regionID, taqvimTime, namazTime)
 			}
 		}()
 	}
@@ -108,22 +139,32 @@ func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime typ
 	return nil
 }
 
-func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime) {
+func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) {
 	if err := s.DeleteMessage(user.ChatID, user.LastMessageID); err != nil {
 		log.Println("Error deleting message: ", err)
 	}
 
 	if namazID == 0 {
-		s.telegram.Handler.TaqvimHandler(context.Background(), s.telegram.Bot, &models.Update{
-			Message: &models.Message{
-				Chat: models.Chat{
-					ID: user.ChatID,
+		if user.PrayerTimeSource == "shuro" && namazTime.Date != "" {
+			s.telegram.Handler.TimeHandler(context.Background(), s.telegram.Bot, &models.Update{
+				Message: &models.Message{
+					Chat: models.Chat{
+						ID: user.ChatID,
+					},
 				},
-			},
-		})
+			})
+		} else {
+			s.telegram.Handler.TaqvimHandler(context.Background(), s.telegram.Bot, &models.Update{
+				Message: &models.Message{
+					Chat: models.Chat{
+						ID: user.ChatID,
+					},
+				},
+			})
+		}
 	}
 
-	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, taqvimTime))
+	r, err := s.telegram.Bot.SendMessage(context.Background(), s.getNextNamazMessage(user, namazID, regionID, taqvimTime, namazTime))
 	if err != nil {
 		log.Println("error sending next namaz time message : ", err.Error())
 		if err.Error() == ErrBlockUser.Error() ||
@@ -145,10 +186,18 @@ func (s *Scheduler) SendMessageForUser(user types.User, namazID, regionID int, t
 	}
 }
 
-func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime) *bot.SendMessageParams {
-	timeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
-	adjustedTime, _ := time.Parse("15:04", timeStr)
-	adjustedTime = adjustedTime.Add(time.Minute * time.Duration(types.RegionsTime[regionID]))
+func (s *Scheduler) getNextNamazMessage(user types.User, namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) *bot.SendMessageParams {
+	var adjustedTime time.Time
+
+	if user.PrayerTimeSource == "shuro" && namazTime.Date != "" {
+		timeStr := getShuroTimeWithNamazID(namazTime, namazID)
+		adjustedTime, _ = time.Parse("15:04", timeStr)
+		adjustedTime = adjustedTime.Add(time.Minute * time.Duration(types.RegionsTime[regionID]))
+	} else {
+		timeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+		adjustedTime, _ = time.Parse("15:04", timeStr)
+		adjustedTime = adjustedTime.Add(time.Minute * time.Duration(types.RegionsTime[regionID]))
+	}
 
 	msg := fmt.Sprintf(
 		`<b>%s:</b> %s
@@ -177,4 +226,20 @@ func (s *Scheduler) DeleteMessage(chatID int64, messageID int) error {
 		return fmt.Errorf("error deleting message: %v, chat_id: %v, message_id = %v", err, chatID, messageID)
 	}
 	return nil
+}
+
+func getShuroTimeWithNamazID(namazTime types.NamazTime, namazID int) string {
+	switch namazID {
+	case 0: // Fajr
+		return namazTime.FajrFrom
+	case 1: // Zuhr
+		return namazTime.ZuhrFrom
+	case 2: // Asr
+		return namazTime.AsrFrom
+	case 3: // Maghrib
+		return namazTime.MaghribFrom
+	case 4: // Isha
+		return namazTime.IshaFrom
+	}
+	return ""
 }

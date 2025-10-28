@@ -70,13 +70,14 @@ type TaqvimTime struct {
 }
 
 type User struct {
-	ChatID        int64     `db:"chat_id"`
-	RegionID      int       `db:"region_id"`
-	Username      string    `db:"username"`
-	Language      string    `db:"lang"`
-	LastMessageID int       `db:"last_message_id"`
-	CreatedAt     time.Time `db:"created_at"`
-	IsDeleted     bool      `db:"is_deleted"`
+	ChatID           int64     `db:"chat_id"`
+	RegionID         int       `db:"region_id"`
+	Username         string    `db:"username"`
+	Language         string    `db:"lang"`
+	LastMessageID    int       `db:"last_message_id"`
+	PrayerTimeSource string    `db:"prayer_time_source"`
+	CreatedAt        time.Time `db:"created_at"`
+	IsDeleted        bool      `db:"is_deleted"`
 }
 
 var SendNotifications map[int]map[int]bool = make(map[int]map[int]bool)

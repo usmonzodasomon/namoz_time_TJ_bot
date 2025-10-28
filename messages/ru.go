@@ -29,4 +29,8 @@ var RU = map[string]string{
 	"Settings":          "Настройки",
 	"SettingsBtn":       "Настройки",
 	"Language":          "Язык",
+	"ChooseSource":      "Выберите источник времени",
+	"TaqvimSource":      "📅 Taqvim.tj",
+	"ShuroSource":       "📋 Shuroiulamo.tj",
+	"SourceSelected":    "Источник изменён на",
 }
