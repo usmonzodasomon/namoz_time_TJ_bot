@@ -36,6 +36,7 @@ func (s *Scheduler) Start() {
 	go s.UpdateTaqvimTime()
 	go s.UpdateTime()
 	go s.SendReminders()
+	go s.SendRamadanReminders()
 
 	_, err := s.sh.NewJob(gocron.CronJob("0 */6 * * *", false), gocron.NewTask(s.UpdateTime))
 	if err != nil {
@@ -43,6 +44,11 @@ func (s *Scheduler) Start() {
 	}
 
 	_, err = s.sh.NewJob(gocron.DurationJob(time.Minute), gocron.NewTask(s.SendReminders), gocron.WithSingletonMode(gocron.LimitModeReschedule))
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = s.sh.NewJob(gocron.DurationJob(time.Minute), gocron.NewTask(s.SendRamadanReminders), gocron.WithSingletonMode(gocron.LimitModeReschedule))
 	if err != nil {
 		log.Println(err)
 	}

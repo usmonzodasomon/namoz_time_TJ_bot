@@ -17,4 +17,5 @@ type Storage interface {
 	UpdateNamazTime(namazTime []types.NamazTime) error
 	UpdateTaqvimTime(taqvimTime types.TaqvimTime) error
 	GetStat() (types.UserStats, error)
+	GetRamadanTimeByDate(date string) (types.RamadanTime, error)
 }

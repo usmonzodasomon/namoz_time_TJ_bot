@@ -73,6 +73,12 @@ func (s *Storage) UpdateUser(user types.User) error {
 		placeHolderCount++
 	}
 
+	if user.LastRamadanMsgID != 0 {
+		queries = append(queries, fmt.Sprintf(" last_ramadan_msg_id = $%d", placeHolderCount))
+		params = append(params, user.LastRamadanMsgID)
+		placeHolderCount++
+	}
+
 	if user.PrayerTimeSource != "" {
 		queries = append(queries, fmt.Sprintf(" prayer_time_source = $%d", placeHolderCount))
 		params = append(params, user.PrayerTimeSource)
@@ -172,6 +178,13 @@ func (s *Storage) UpdateTaqvimTime(taqvimTime types.TaqvimTime) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Storage) GetRamadanTimeByDate(date string) (types.RamadanTime, error) {
+	q := "SELECT date, subh_sadiq, shom FROM ramadan_schedule WHERE date = $1"
+	var rt types.RamadanTime
+	err := s.db.Get(&rt, q, date)
+	return rt, err
 }
 
 func (s *Storage) GetStat() (types.UserStats, error) {

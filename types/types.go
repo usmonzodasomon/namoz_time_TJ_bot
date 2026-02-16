@@ -70,14 +70,15 @@ type TaqvimTime struct {
 }
 
 type User struct {
-	ChatID           int64     `db:"chat_id"`
-	RegionID         int       `db:"region_id"`
-	Username         string    `db:"username"`
-	Language         string    `db:"lang"`
-	LastMessageID    int       `db:"last_message_id"`
-	PrayerTimeSource string    `db:"prayer_time_source"`
-	CreatedAt        time.Time `db:"created_at"`
-	IsDeleted        bool      `db:"is_deleted"`
+	ChatID              int64     `db:"chat_id"`
+	RegionID            int       `db:"region_id"`
+	Username            string    `db:"username"`
+	Language            string    `db:"lang"`
+	LastMessageID       int       `db:"last_message_id"`
+	LastRamadanMsgID    int       `db:"last_ramadan_msg_id"`
+	PrayerTimeSource    string    `db:"prayer_time_source"`
+	CreatedAt           time.Time `db:"created_at"`
+	IsDeleted           bool      `db:"is_deleted"`
 }
 
 var SendNotifications map[int]map[int]bool = make(map[int]map[int]bool)
@@ -182,6 +183,14 @@ var RegionsTime = map[int]int{
 	18: 4,   // Носири Хусрав
 	19: 3,   // Турсунзода
 }
+
+type RamadanTime struct {
+	Date      string `db:"date"`
+	SubhSadiq string `db:"subh_sadiq"`
+	Shom      string `db:"shom"`
+}
+
+var SendRamadanNotifications map[int]map[int]bool = make(map[int]map[int]bool)
 
 type Region struct {
 	ID   int    `db:"id"`
