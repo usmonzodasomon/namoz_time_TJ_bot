@@ -19,7 +19,7 @@ func (h *Handler) RamadanHandler(ctx context.Context, b *bot.Bot, update *models
 
 	_, err = b.SendPhoto(ctx, &bot.SendPhotoParams{
 		ChatID:      update.Message.Chat.ID,
-		Photo:       &models.InputFileString{Data: "СЮДА_ВСТАВЬ_FILE_ID"},
+		Photo:       &models.InputFileString{Data: "AgACAgIAAxkBAAGhLMdpkwREcZfWai2SEvlw3_DOT09bwAACqhRrG8jlmEhaFTGz7vX3_gEAAwIAA3kAAzoE"},
 		Caption:     messages.Messages[user.Language]["RamadanCaption"],
 		ReplyMarkup: inlineButtonMain(user.Language),
 	})
