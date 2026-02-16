@@ -33,4 +33,6 @@ var RU = map[string]string{
 	"TaqvimSource":      "📅 Taqvim.tj",
 	"ShuroSource":       "📋 Shuroiulamo.tj",
 	"SourceSelected":    "Источник изменён на",
+	"RamadanBtn":        "Расписание священного месяца Рамадан",
+	"RamadanCaption":    "📅 Расписание священного месяца Рамадан",
 }

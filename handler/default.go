@@ -12,6 +12,9 @@ func (h *Handler) DefaultHandler(ctx context.Context, b *bot.Bot, update *models
 	if update.Message == nil {
 		return
 	}
+	if update.Message.Photo != nil && len(update.Message.Photo) > 0 {
+		log.Println("file_id:", update.Message.Photo[len(update.Message.Photo)-1].FileID)
+	}
 	user, err := h.storage.GetUser(update.Message.Chat.ID)
 	if err != nil {
 		log.Println(err)

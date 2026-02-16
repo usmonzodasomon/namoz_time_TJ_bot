@@ -37,6 +37,7 @@ func (b *Bot) Start(ctx context.Context) {
 	b.Bot.RegisterHandlerMatchFunc(isRegionButton, b.Handler.RegionHandler)
 	b.Bot.RegisterHandlerMatchFunc(isSettingsButton, b.Handler.SettingsHandler)
 	b.Bot.RegisterHandlerMatchFunc(isTaqvimButton, b.Handler.TaqvimHandler)
+	b.Bot.RegisterHandlerMatchFunc(isRamadanButton, b.Handler.RamadanHandler)
 
 	b.Bot.Start(ctx)
 }

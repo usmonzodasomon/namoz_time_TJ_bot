@@ -25,3 +25,7 @@ func isTaqvimButton(update *models.Update) bool {
 func isSettingsButton(update *models.Update) bool {
 	return update.Message != nil && (update.Message.Text == "⚙️ "+messages.Messages["ru"]["SettingsBtn"] || update.Message.Text == "⚙️ "+messages.Messages["tj"]["SettingsBtn"])
 }
+
+func isRamadanButton(update *models.Update) bool {
+	return update.Message != nil && (update.Message.Text == "🌙 "+messages.Messages["ru"]["RamadanBtn"] || update.Message.Text == "🌙 "+messages.Messages["tj"]["RamadanBtn"])
+}

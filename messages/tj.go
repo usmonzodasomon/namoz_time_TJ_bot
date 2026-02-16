@@ -33,4 +33,6 @@ var TJ = map[string]string{
 	"TaqvimSource":      "📅 Taqvim.tj",
 	"ShuroSource":       "📋 Shuroiulamo.tj",
 	"SourceSelected":    "Манбаъ иваз шуд ба",
+	"RamadanBtn":        "Таквими моҳи шарифи Рамазон",
+	"RamadanCaption":    "📅 Таквими моҳи шарифи Рамазон",
 }
