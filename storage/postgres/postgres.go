@@ -181,7 +181,7 @@ func (s *Storage) UpdateTaqvimTime(taqvimTime types.TaqvimTime) error {
 }
 
 func (s *Storage) GetRamadanTimeByDate(date string) (types.RamadanTime, error) {
-	q := "SELECT date, subh_sadiq, shom FROM ramadan_schedule WHERE date = $1"
+	q := "SELECT date, TO_CHAR(subh_sadiq, 'HH24:MI') as subh_sadiq, TO_CHAR(shom, 'HH24:MI') as shom FROM ramadan_schedule WHERE date = $1"
 	var rt types.RamadanTime
 	err := s.db.Get(&rt, q, date)
 	return rt, err
