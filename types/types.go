@@ -81,7 +81,7 @@ type User struct {
 	IsDeleted           bool      `db:"is_deleted"`
 }
 
-var SendNotifications map[int]map[int]bool = make(map[int]map[int]bool)
+var SendNotifications map[int]map[string]map[int]bool = make(map[int]map[string]map[int]bool)
 
 var RegionsID = map[string]int{
 	"Душанбе":            1,

@@ -45,44 +45,40 @@ func (s *Scheduler) SendRemindersForNamaz(namazID int, taqvimTime types.TaqvimTi
 }
 
 func (s *Scheduler) SendRemindersForRegion(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) {
-	if types.SendNotifications[regionID][namazID] {
-		return
-	}
-
 	nowInMinutes := getMinutes(time.Now())
 
-	users, err := s.storage.GetAllUsersByRegionID(regionID)
-	if err != nil {
-		log.Println("error getting users:", err)
-		return
-	}
+	// Check and send for taqvim users
+	if !types.SendNotifications[regionID]["taqvim"][namazID] {
+		taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
+		taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
+		taqvimMinutes := getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
 
-	shouldSend := false
-	for _, user := range users {
-		var userNamazTimeInMinutes int
-
-		if user.PrayerTimeSource == "shuro" && namazTime.Date != "" {
-			shuroTimeStr := getShuroTimeWithNamazID(namazTime, namazID)
-			shuroTimeObj, _ := time.Parse("15:04", shuroTimeStr)
-			userNamazTimeInMinutes = getMinutes(shuroTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
-		} else {
-			taqvimTimeStr := getTaqvimTimeWithNamazID(taqvimTime, namazID)
-			taqvimTimeObj, _ := time.Parse("15:04", taqvimTimeStr)
-			userNamazTimeInMinutes = getMinutes(taqvimTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
-		}
-
-		if isNamazTime(userNamazTimeInMinutes, nowInMinutes) {
-			shouldSend = true
-			break
+		if isNamazTime(taqvimMinutes, nowInMinutes) {
+			if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime, namazTime, "taqvim"); err != nil {
+				log.Println("error sending taqvim notification:", err)
+			}
+			if types.SendNotifications[regionID] == nil {
+				types.SendNotifications[regionID] = make(map[string]map[int]bool)
+			}
+			types.SendNotifications[regionID]["taqvim"] = map[int]bool{namazID: true}
 		}
 	}
 
-	if shouldSend {
-		if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime, namazTime); err != nil {
-			log.Println("error sending notification:", err)
+	// Check and send for shuro users
+	if namazTime.Date != "" && !types.SendNotifications[regionID]["shuro"][namazID] {
+		shuroTimeStr := getShuroTimeWithNamazID(namazTime, namazID)
+		shuroTimeObj, _ := time.Parse("15:04", shuroTimeStr)
+		shuroMinutes := getMinutes(shuroTimeObj.Add(time.Minute * time.Duration(types.RegionsTime[regionID])))
+
+		if isNamazTime(shuroMinutes, nowInMinutes) {
+			if err := s.SendMessageForAllUsers(namazID, regionID, taqvimTime, namazTime, "shuro"); err != nil {
+				log.Println("error sending shuro notification:", err)
+			}
+			if types.SendNotifications[regionID] == nil {
+				types.SendNotifications[regionID] = make(map[string]map[int]bool)
+			}
+			types.SendNotifications[regionID]["shuro"] = map[int]bool{namazID: true}
 		}
-		types.SendNotifications[regionID] = make(map[int]bool)
-		types.SendNotifications[regionID][namazID] = true
 	}
 }
 
@@ -111,20 +107,33 @@ func getMinutes(t time.Time) int {
 	return t.Hour()*60 + t.Minute()
 }
 
-func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime) error {
-	users, err := s.storage.GetAllUsersByRegionID(regionID)
+func (s *Scheduler) SendMessageForAllUsers(namazID, regionID int, taqvimTime types.TaqvimTime, namazTime types.NamazTime, source string) error {
+	allUsers, err := s.storage.GetAllUsersByRegionID(regionID)
 	if err != nil {
 		return err
 	}
 
+	var users []types.User
+	for _, u := range allUsers {
+		if source == "shuro" && u.PrayerTimeSource == "shuro" {
+			users = append(users, u)
+		} else if source == "taqvim" && (u.PrayerTimeSource != "shuro" || namazTime.Date == "") {
+			users = append(users, u)
+		}
+	}
+
+	if len(users) == 0 {
+		return nil
+	}
+
 	ch := make(chan types.User)
 	wg := &sync.WaitGroup{}
-	go func(ch chan types.User) {
+	go func() {
 		for _, user := range users {
 			ch <- user
 		}
 		close(ch)
-	}(ch)
+	}()
 
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
