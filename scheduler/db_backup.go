@@ -80,7 +80,7 @@ func (s *Scheduler) sendBackupToAdmin(filePath string, fileSize int64) error {
 	}
 	defer file.Close()
 
-	caption := fmt.Sprintf(`📦 <b>Ежедневный бекап БД</b>
+	caption := fmt.Sprintf(`📦 <b>Еженедельный бекап БД</b>
 📅 Дата: %s
 📊 Размер: %.2f MB
 ✅ Статус: Успешно`,

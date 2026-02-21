@@ -58,8 +58,8 @@ func (s *Scheduler) Start() {
 		log.Println(err)
 	}
 
-	// Database backup job - runs daily at 03:00
-	_, err = s.sh.NewJob(gocron.CronJob("0 3 * * *", false), gocron.NewTask(s.SendDatabaseBackup))
+	// Database backup job - runs every Sunday at 03:00
+	_, err = s.sh.NewJob(gocron.CronJob("0 3 * * 0", false), gocron.NewTask(s.SendDatabaseBackup))
 	if err != nil {
 		log.Println(err)
 	}
