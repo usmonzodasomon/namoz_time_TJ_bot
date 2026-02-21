@@ -83,9 +83,7 @@ func (s *Scheduler) sendRamadanReminderForRegion(reminderType, regionID int, ram
 	}
 	wg.Wait()
 
-	if types.SendRamadanNotifications[regionID] == nil {
-		types.SendRamadanNotifications[regionID] = make(map[int]bool)
-	}
+	types.SendRamadanNotifications[regionID] = make(map[int]bool)
 	types.SendRamadanNotifications[regionID][reminderType] = true
 }
 
