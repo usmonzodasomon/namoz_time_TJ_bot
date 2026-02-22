@@ -28,8 +28,8 @@ func (h *Handler) MailingMeHandler(ctx context.Context, b *bot.Bot, update *mode
 		})
 		if err != nil {
 			log.Println(err)
-			return
 		}
+		return
 	}
 
 	_, err = b.CopyMessage(ctx, &bot.CopyMessageParams{
@@ -90,9 +90,10 @@ func (h *Handler) MailingAllHandler(ctx context.Context, b *bot.Bot, update *mod
 			defer wg.Done()
 			for u := range ch {
 				now := time.Now()
-				_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+				_, err = b.CopyMessage(ctx, &bot.CopyMessageParams{
 					ChatID:      u.ChatID,
-					Text:        update.Message.ReplyToMessage.Text,
+					FromChatID:  update.Message.Chat.ID,
+					MessageID:   update.Message.ReplyToMessage.ID,
 					ReplyMarkup: inlineButtonMain(u.Language),
 				})
 				if err != nil {
