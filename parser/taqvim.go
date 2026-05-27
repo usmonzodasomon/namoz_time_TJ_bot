@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 	"github.com/usmonzodasomon/namoz_time_TJ_bot/types"
 	"regexp"
 )
@@ -13,19 +14,34 @@ const (
 )
 
 func GetTaqvimNamazTime() (*types.TaqvimTime, error) {
-	url := launcher.New().
+	controlURL, err := launcher.New().
 		Bin("/usr/bin/chromium-browser").
 		Headless(true).
 		NoSandbox(true).
-		MustLaunch()
+		Launch()
+	if err != nil {
+		return nil, fmt.Errorf("failed to launch browser: %w", err)
+	}
 
-	browser := rod.New().ControlURL(url).MustConnect()
-	defer browser.MustClose()
+	browser := rod.New().ControlURL(controlURL)
+	if err := browser.Connect(); err != nil {
+		return nil, fmt.Errorf("failed to connect to browser: %w", err)
+	}
+	defer browser.Close()
 
-	page := browser.MustPage(taqvimUrl)
-	page.MustWaitLoad()
+	page, err := browser.Page(proto.TargetCreateTarget{URL: taqvimUrl})
+	if err != nil {
+		return nil, fmt.Errorf("failed to navigate to %s: %w", taqvimUrl, err)
+	}
 
-	htmlContent := page.MustHTML()
+	if err := page.WaitLoad(); err != nil {
+		return nil, fmt.Errorf("failed to wait for page load: %w", err)
+	}
+
+	htmlContent, err := page.HTML()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get page HTML: %w", err)
+	}
 
 	taqvimTimes, err := getMasjidiMarkaziTimes(htmlContent)
 	if err != nil {
