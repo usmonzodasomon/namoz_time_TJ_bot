@@ -2,3 +2,4 @@
 .env
 /data/sqlite/bot.db
 /data/logs/logfile.txtramadan_2026_insert.sql
+/.claude
