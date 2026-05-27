@@ -45,6 +45,9 @@ func GetShuroNamazTimes(month, year string) ([]types.NamazTime, error) {
 				namazTime.Date = data
 			} else {
 				sl := strings.Split(data, " - ")
+				if len(sl) < 2 {
+					continue
+				}
 				if cnt == 3 {
 					namazTime.FajrFrom = sl[0]
 					namazTime.FajrTo = sl[1]
