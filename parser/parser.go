@@ -43,6 +43,8 @@ func GetShuroNamazTimes(month, year string) ([]types.NamazTime, error) {
 			data = strings.TrimSpace(data)
 			if cnt == 1 {
 				namazTime.Date = data
+			} else if cnt == 2 {
+				namazTime.HijriDate = data
 			} else {
 				sl := strings.Split(data, " - ")
 				if len(sl) < 2 {

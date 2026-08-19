@@ -30,7 +30,7 @@ func (h *Handler) TimeHandler(ctx context.Context, b *bot.Bot, update *models.Up
 
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
-🏢 <b><i>%s:        %s</i></b>
+%s🏢 <b><i>%s:        %s</i></b>
 📰 <b><i>%s: shuroiulamo.tj</i></b>
 
 <b><i>%s %s:</i></b>          <code>%s - %s</code>
@@ -40,6 +40,7 @@ func (h *Handler) TimeHandler(ctx context.Context, b *bot.Bot, update *models.Up
 <b><i>%s %s:</i></b>          <code>%s - %s</code>
 `,
 		messages.Messages[user.Language]["Today"], date, messages.Messages[user.Language][time.Now().Weekday().String()],
+		hijriDateLine(user.Language, namazTime.HijriDate),
 		messages.Messages[user.Language]["Region"], types.Regions[user.Language][user.RegionID-1],
 		messages.Messages[user.Language]["Source"],
 		types.Stickers[0], types.NamazIndex[user.Language][0], namazTime.FajrFrom, namazTime.FajrTo,

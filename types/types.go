@@ -49,6 +49,7 @@ type NamazTimeStruct struct {
 
 type NamazTime struct {
 	Date        string `db:"date"`
+	HijriDate   string `db:"hijri_date"`
 	FajrFrom    string `db:"fajr_from"`
 	FajrTo      string `db:"fajr_to"`
 	ZuhrFrom    string `db:"zuhr_from"`
@@ -62,11 +63,12 @@ type NamazTime struct {
 }
 
 type TaqvimTime struct {
-	Fajr    string `db:"fajr"`
-	Zuhr    string `db:"zuhr"`
-	Asr     string `db:"asr"`
-	Maghrib string `db:"maghrib"`
-	Isha    string `db:"isha"`
+	HijriDate string `db:"hijri_date"`
+	Fajr      string `db:"fajr"`
+	Zuhr      string `db:"zuhr"`
+	Asr       string `db:"asr"`
+	Maghrib   string `db:"maghrib"`
+	Isha      string `db:"isha"`
 }
 
 type User struct {

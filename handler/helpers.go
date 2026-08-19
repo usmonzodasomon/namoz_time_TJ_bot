@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -73,6 +74,15 @@ func (h *Handler) GetNamazTimeForCurrentRegion(namazTime types.NamazTime, region
 	namazTime.IshaTo = IshaTo.Add(time.Minute * time.Duration(q)).Format("15:04")
 
 	return namazTime
+}
+
+// hijriDateLine возвращает готовую строку с датой по хиджре (с переводом строки)
+// либо пустую строку, если даты нет — тогда блок просто не выводится.
+func hijriDateLine(lang, hijriDate string) string {
+	if hijriDate == "" {
+		return ""
+	}
+	return fmt.Sprintf("🌙 <b><i>%s: %s</i></b>\n", messages.Messages[lang]["HijriDate"], hijriDate)
 }
 
 func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {

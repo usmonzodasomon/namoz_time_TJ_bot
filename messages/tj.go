@@ -24,6 +24,7 @@ var TJ = map[string]string{
 	"Suhur":             "Нияти субҳгоҳии рӯза",
 	"Iftar":             "Нияти шомгоҳии рӯза",
 	"Taqvim":            "Вақти намоз taqvim.tj",
+	"HijriDate":         "Санаи ҳиҷрӣ",
 	"Region":            "Шаҳр",
 	"Source":            "Манбаъ",
 	"Settings":          "Танзимот",

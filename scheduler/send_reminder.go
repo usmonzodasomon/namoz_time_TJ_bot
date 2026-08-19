@@ -22,13 +22,15 @@ var (
 )
 
 func (s *Scheduler) SendReminders() {
-	taqvimTime, err := s.storage.GetTaqvimTime()
+	date := time.Now().Format("02.01.2006")
+
+	taqvimTime, err := s.storage.GetTaqvimTime(date)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 
-	namazTime, err := s.storage.GetNamazTime(time.Now().Format("02.01.2006"))
+	namazTime, err := s.storage.GetNamazTime(date)
 	if err != nil {
 		log.Println("warning: could not get namaz time:", err.Error())
 	}

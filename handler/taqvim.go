@@ -21,7 +21,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 	}
 
 	date := time.Now().Format("02.01.2006")
-	taqvimTime, err := h.storage.GetTaqvimTime()
+	taqvimTime, err := h.storage.GetTaqvimTime(date)
 	if err != nil {
 		log.Println(err)
 		return
@@ -31,7 +31,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 
 	namazString := fmt.Sprintf(`
 📆 <b><i>%s: %s, %s</i></b>
-🏢 <b><i>%s:        %s</i></b>
+%s🏢 <b><i>%s:        %s</i></b>
 📰 <b><i>%s: taqvim.tj</i></b>
 
 <b><i>%s %s:</i></b>          <code>%s</code>
@@ -41,6 +41,7 @@ func (h *Handler) TaqvimHandler(ctx context.Context, b *bot.Bot, update *models.
 <b><i>%s %s:</i></b>          <code>%s</code>
 `,
 		messages.Messages[user.Language]["Today"], date, messages.Messages[user.Language][time.Now().Weekday().String()],
+		hijriDateLine(user.Language, taqvimTime.HijriDate),
 		messages.Messages[user.Language]["Region"], types.Regions[user.Language][user.RegionID-1],
 		messages.Messages[user.Language]["Source"],
 		types.Stickers[0], types.NamazIndex[user.Language][0], taqvimTime.Fajr,

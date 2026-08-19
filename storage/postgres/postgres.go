@@ -120,10 +120,16 @@ func (s *Storage) GetNamazTime(date string) (types.NamazTime, error) {
 	return namazTime, err
 }
 
-func (s *Storage) GetTaqvimTime() (types.TaqvimTime, error) {
-	q := "SELECT * FROM taqvim_time"
+// GetTaqvimTime возвращает время намаза с taqvim.tj. taqvim.tj не отдаёт дату
+// по хиджре, поэтому она подтягивается из namaz_time (shuroiulamo.tj) по date.
+// Если записи shuroiulamo.tj за этот день ещё нет, hijri_date будет пустой.
+func (s *Storage) GetTaqvimTime(date string) (types.TaqvimTime, error) {
+	q := `SELECT t.fajr, t.zuhr, t.asr, t.maghrib, t.isha, COALESCE(n.hijri_date, '') AS hijri_date
+		FROM taqvim_time t
+		LEFT JOIN namaz_time n ON n.date = $1
+		LIMIT 1`
 	var taqvimTime types.TaqvimTime
-	err := s.db.Get(&taqvimTime, q)
+	err := s.db.Get(&taqvimTime, q, date)
 	return taqvimTime, err
 }
 
@@ -153,8 +159,8 @@ func (s *Storage) UpdateNamazTime(namazTime []types.NamazTime) error {
 		return err
 	}
 
-	q = `INSERT INTO namaz_time(date, fajr_from, fajr_to, zuhr_from, zuhr_to, asr_from, asr_to, maghrib_from, maghrib_to, isha_from, isha_to) 
-		VALUES(:date, :fajr_from, :fajr_to, :zuhr_from, :zuhr_to, :asr_from,
+	q = `INSERT INTO namaz_time(date, hijri_date, fajr_from, fajr_to, zuhr_from, zuhr_to, asr_from, asr_to, maghrib_from, maghrib_to, isha_from, isha_to) 
+		VALUES(:date, :hijri_date, :fajr_from, :fajr_to, :zuhr_from, :zuhr_to, :asr_from,
 				:asr_to, :maghrib_from, :maghrib_to, :isha_from, :isha_to)`
 
 	_, err = s.db.NamedExec(q, namazTime)
