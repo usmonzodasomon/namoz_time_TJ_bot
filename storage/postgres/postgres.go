@@ -120,9 +120,6 @@ func (s *Storage) GetNamazTime(date string) (types.NamazTime, error) {
 	return namazTime, err
 }
 
-// GetTaqvimTime возвращает время намаза с taqvim.tj. taqvim.tj не отдаёт дату
-// по хиджре, поэтому она подтягивается из namaz_time (shuroiulamo.tj) по date.
-// Если записи shuroiulamo.tj за этот день ещё нет, hijri_date будет пустой.
 func (s *Storage) GetTaqvimTime(date string) (types.TaqvimTime, error) {
 	q := `SELECT t.fajr, t.zuhr, t.asr, t.maghrib, t.isha, COALESCE(n.hijri_date, '') AS hijri_date
 		FROM taqvim_time t

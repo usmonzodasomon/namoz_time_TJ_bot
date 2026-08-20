@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-telegram/bot/models"
@@ -76,13 +78,30 @@ func (h *Handler) GetNamazTimeForCurrentRegion(namazTime types.NamazTime, region
 	return namazTime
 }
 
-// hijriDateLine возвращает готовую строку с датой по хиджре (с переводом строки)
-// либо пустую строку, если даты нет — тогда блок просто не выводится.
+func formatHijriDate(lang, hijriDate string) string {
+	parts := strings.Split(hijriDate, ".")
+	if len(parts) != 3 {
+		return hijriDate
+	}
+
+	month, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return hijriDate
+	}
+
+	monthName := types.HijriMonths[lang][month]
+	if monthName == "" {
+		return hijriDate
+	}
+
+	return fmt.Sprintf("%s, %s", hijriDate, monthName)
+}
+
 func hijriDateLine(lang, hijriDate string) string {
 	if hijriDate == "" {
 		return ""
 	}
-	return fmt.Sprintf("🌙 <b><i>%s: %s</i></b>\n", messages.Messages[lang]["HijriDate"], hijriDate)
+	return fmt.Sprintf("🌙 <b><i>%s: %s</i></b>\n", messages.Messages[lang]["HijriDate"], formatHijriDate(lang, hijriDate))
 }
 
 func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
