@@ -101,7 +101,7 @@ func hijriDateLine(lang, hijriDate string) string {
 	if hijriDate == "" {
 		return ""
 	}
-	return fmt.Sprintf("🌙 <b><i>%s: %s</i></b>\n", messages.Messages[lang]["HijriDate"], formatHijriDate(lang, hijriDate))
+	return fmt.Sprintf("🌙 <b><i>%s</i></b>\n", formatHijriDate(lang, hijriDate))
 }
 
 func inlineButtonMain(lang string) *models.ReplyKeyboardMarkup {
