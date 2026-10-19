@@ -31,8 +31,7 @@ func main() {
 	log.SetOutput(io.MultiWriter(os.Stdout, file))
 
 	if err := godotenv.Load(); err != nil {
-		log.Printf("error loading env variables: %s", err.Error())
-		return
+		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	dbConfig := database.Config{
@@ -44,8 +43,7 @@ func main() {
 	}
 	dbConn, err := database.GetDBConnection(dbConfig)
 	if err != nil {
-		log.Println(fmt.Errorf("error connecting to db: %w", err))
-		return
+		log.Fatal(fmt.Errorf("error connecting to db: %w", err))
 	}
 
 	storage := postgres.NewPostgresStorage(dbConn)
